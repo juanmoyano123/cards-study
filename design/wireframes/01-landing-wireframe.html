@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudyMaster - Landing Page Wireframe</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        /* Wireframe styling - minimal colors */
+        .wireframe-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            border-bottom: 2px solid #ddd;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            width: 150px;
+            height: 40px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links li {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            border-radius: 4px;
+        }
+
+        .cta-header {
+            padding: 12px 24px;
+            background: #333;
+            color: white;
+            border-radius: 24px;
+            text-decoration: none;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 80px 40px;
+            text-align: center;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #222;
+        }
+
+        .hero .subheadline {
+            font-size: 20px;
+            color: #666;
+            max-width: 600px;
+            margin: 0 auto 40px;
+        }
+
+        .hero-cta {
+            display: inline-block;
+            padding: 16px 48px;
+            background: #333;
+            color: white;
+            text-decoration: none;
+            border-radius: 28px;
+            font-size: 18px;
+            margin-bottom: 40px;
+        }
+
+        .demo-area {
+            width: 100%;
+            max-width: 800px;
+            height: 450px;
+            background: #f8f8f8;
+            border: 2px solid #ddd;
+            margin: 0 auto;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: #999;
+        }
+
+        /* Social Proof */
+        .social-proof {
+            padding: 60px 40px;
+            background: #fafafa;
+            text-align: center;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .testimonials {
+            display: flex;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 40px auto 0;
+        }
+
+        .testimonial-card {
+            flex: 1;
+            padding: 30px;
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+        }
+
+        /* Features Grid */
+        .features {
+            padding: 80px 40px;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 60px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .feature-card {
+            text-align: center;
+            padding: 40px 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: #fafafa;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: #e0e0e0;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+        }
+
+        /* How It Works */
+        .how-it-works {
+            padding: 80px 40px;
+            background: #fafafa;
+            border-bottom: 2px solid #ddd;
+        }
+
+        .how-it-works h2 {
+            text-align: center;
+            font-size: 36px;
+            margin-bottom: 60px;
+        }
+
+        .steps {
+            display: flex;
+            justify-content: space-around;
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .step {
+            text-align: center;
+            flex: 1;
+            padding: 20px;
+        }
+
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: #333;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 40px;
+            text-align: center;
+            background: #f0f0f0;
+        }
+
+        .cta-section h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .cta-section p {
+            font-size: 18px;
+            margin-bottom: 40px;
+            color: #666;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 40px;
+            background: #333;
+            color: white;
+            text-align: center;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .hero {
+                padding: 40px 20px;
+            }
+
+            .testimonials {
+                flex-direction: column;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .steps {
+                flex-direction: column;
+            }
+
+            .demo-area {
+                height: 250px;
+                font-size: 14px;
+            }
+        }
+
+        /* Annotations */
+        .annotation {
+            position: absolute;
+            background: #FFE4B5;
+            border: 1px solid #FFA500;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Wireframe Container -->
+    <div class="wireframe-container">
+        <!-- Header Navigation -->
+        <header class="header">
+            <div class="logo">STUDYMASTER</div>
+            <nav>
+                <ul class="nav-links">
+                    <li>Features</li>
+                    <li>Pricing</li>
+                    <li>About</li>
+                    <li>Blog</li>
+                </ul>
+            </nav>
+            <a href="#" class="cta-header">Start Free Trial</a>
+        </header>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>AI-Powered Flashcards for<br>Smarter Studying</h1>
+            <p class="subheadline">
+                Transform any study material into smart flashcards in seconds.<br>
+                Study less, retain more with scientifically-proven spaced repetition.
+            </p>
+            <a href="#" class="hero-cta">Start Free Trial →</a>
+            <div class="demo-area">
+                [30-second Demo Video/GIF]<br>
+                PDF → AI Processing → Flashcards Generated
+            </div>
+        </section>
+
+        <!-- Social Proof -->
+        <section class="social-proof">
+            <h2>Trusted by Students Worldwide</h2>
+            <p>Join thousands of students improving their grades</p>
+            <div class="testimonials">
+                <div class="testimonial-card">
+                    <div class="avatar"></div>
+                    <p>"StudyMaster helped me ace my anatomy exam with 70% less study time!"</p>
+                    <p><strong>Sarah M.</strong><br>Medical Student, UCLA</p>
+                </div>
+                <div class="testimonial-card">
+                    <div class="avatar"></div>
+                    <p>"The AI flashcard generation is incredible. Saved me hours every week."</p>
+                    <p><strong>James L.</strong><br>Computer Science, MIT</p>
+                </div>
+                <div class="testimonial-card">
+                    <div class="avatar"></div>
+                    <p>"Finally, spaced repetition that actually works on mobile!"</p>
+                    <p><strong>Maria G.</strong><br>Law Student, Harvard</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Features Grid -->
+        <section class="features">
+            <h2>Everything You Need to Study Smarter</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>AI Generation</h3>
+                    <p>Upload any PDF or paste text. Our AI creates perfect flashcards in seconds with 85%+ accuracy.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>Spaced Repetition</h3>
+                    <p>Science-backed FSRS algorithm shows cards at optimal intervals for maximum retention.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"></div>
+                    <h3>Progress Tracking</h3>
+                    <p>Visual heatmaps and streaks keep you motivated. See your knowledge grow day by day.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section class="how-it-works">
+            <h2>How It Works</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Upload Material</h3>
+                    <p>PDF, text, or notes</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>AI Generates</h3>
+                    <p>Smart flashcards in 30 seconds</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>Study Daily</h3>
+                    <p>Optimized spaced repetition</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3>Ace Your Exams</h3>
+                    <p>Better grades, less stress</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section">
+            <h2>Ready to Transform Your Study Habits?</h2>
+            <p>Join thousands of students studying smarter, not harder.</p>
+            <a href="#" class="hero-cta">Start Your Free Trial</a>
+            <p style="margin-top: 20px; font-size: 14px;">No credit card required • 7-day free trial</p>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2025 StudyMaster. All rights reserved.</p>
+            <p style="margin-top: 10px;">
+                <a href="#" style="color: #ccc; margin: 0 10px;">Privacy Policy</a> |
+                <a href="#" style="color: #ccc; margin: 0 10px;">Terms of Service</a> |
+                <a href="#" style="color: #ccc; margin: 0 10px;">Contact</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
