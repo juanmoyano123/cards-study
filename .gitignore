@@ -1,0 +1,200 @@
+# ============================================================================
+# StudyMaster - .gitignore
+# ============================================================================
+
+# ============================================================================
+# BACKEND (Python)
+# ============================================================================
+
+# Virtual Environment
+backend/venv/
+backend/.venv/
+backend/env/
+backend/ENV/
+
+# Python
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.py[cod]
+backend/*$py.class
+backend/*.so
+backend/.Python
+
+# Distribution / packaging
+backend/build/
+backend/develop-eggs/
+backend/dist/
+backend/downloads/
+backend/eggs/
+backend/.eggs/
+backend/lib/
+backend/lib64/
+backend/parts/
+backend/sdist/
+backend/var/
+backend/wheels/
+backend/*.egg-info/
+backend/.installed.cfg
+backend/*.egg
+
+# PyInstaller
+backend/*.manifest
+backend/*.spec
+
+# Unit test / coverage
+backend/.pytest_cache/
+backend/.coverage
+backend/.coverage.*
+backend/htmlcov/
+backend/.tox/
+backend/.nox/
+backend/coverage.xml
+backend/*.cover
+
+# Jupyter Notebook
+backend/.ipynb_checkpoints
+
+# pyenv
+backend/.python-version
+
+# Environment variables
+backend/.env
+backend/.env.local
+backend/.env.*.local
+
+# IDE
+backend/.vscode/
+backend/.idea/
+backend/*.swp
+backend/*.swo
+backend/*~
+
+# Logs
+backend/*.log
+backend/logs/
+
+# Database
+backend/*.db
+backend/*.sqlite
+backend/*.sqlite3
+
+# Alembic
+backend/alembic/versions/*.py
+!backend/alembic/versions/__init__.py
+
+# mypy
+backend/.mypy_cache/
+backend/.dmypy.json
+backend/dmypy.json
+
+# ============================================================================
+# FRONTEND (React Native / Expo)
+# ============================================================================
+
+# Dependencies
+mobile/node_modules/
+mobile/.pnp
+mobile/.pnp.js
+
+# Expo
+mobile/.expo/
+mobile/.expo-shared/
+mobile/dist/
+mobile/web-build/
+
+# Testing
+mobile/coverage/
+
+# Production
+mobile/build/
+
+# Misc
+mobile/.DS_Store
+mobile/*.pem
+
+# Environment variables
+mobile/.env
+mobile/.env.local
+mobile/.env.development.local
+mobile/.env.test.local
+mobile/.env.production.local
+
+# Logs
+mobile/npm-debug.log*
+mobile/yarn-debug.log*
+mobile/yarn-error.log*
+mobile/lerna-debug.log*
+mobile/.pnpm-debug.log*
+
+# IDE
+mobile/.vscode/
+mobile/.idea/
+
+# OS
+mobile/.DS_Store
+mobile/Thumbs.db
+
+# Temporary files
+mobile/*.tmp
+mobile/*.temp
+
+# ============================================================================
+# DOCKER
+# ============================================================================
+
+# Docker volumes
+postgres_data/
+pgadmin_data/
+
+# ============================================================================
+# SHARED / ROOT
+# ============================================================================
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/
+
+# ============================================================================
+# PROJECT SPECIFIC
+# ============================================================================
+
+# Design files (optional - if you don't want to track large design files)
+# design/*.sketch
+# design/*.fig
+# design/*.psd
+
+# Documentation builds
+docs/_build/
+docs/.doctrees/
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
