@@ -1,17 +1,16 @@
-import { View, Text } from 'react-native';
+import { Redirect } from 'expo-router';
+import { useAuthStore } from '../stores/authStore';
 
 export default function Index() {
-  return (
-    <View className="flex-1 items-center justify-center bg-white">
-      <Text className="text-4xl font-bold text-primary-500">
-        StudyMaster
-      </Text>
-      <Text className="text-lg text-neutral-600 mt-4">
-        AI-Powered Flashcards
-      </Text>
-      <Text className="text-sm text-neutral-500 mt-2">
-        Phase 1: Setup Complete ✅
-      </Text>
-    </View>
-  );
+  const { user, initialized } = useAuthStore();
+
+  if (!initialized) {
+    return null;
+  }
+
+  if (user) {
+    return <Redirect href="/(tabs)" />;
+  }
+
+  return <Redirect href="/(auth)/login" />;
 }
