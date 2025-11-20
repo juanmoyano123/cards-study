@@ -1,113 +1,100 @@
-# StudyMaster Mobile
+# StudyMaster Mobile App
 
-React Native + Expo mobile application for StudyMaster.
+React Native mobile application for StudyMaster - AI-powered flashcard platform.
 
-## Tech Stack
+## 📱 Tech Stack
 
-- **Framework:** React Native + Expo
+- **Framework:** React Native + Expo SDK 50
 - **Language:** TypeScript
-- **Styling:** NativeWind (Tailwind CSS for React Native)
 - **Navigation:** Expo Router (file-based routing)
+- **Styling:** NativeWind (Tailwind CSS for React Native)
 - **State Management:** Zustand
 - **HTTP Client:** Axios
-- **Auth:** Supabase
-- **Testing:** Jest + React Native Testing Library
+- **Authentication:** Supabase Auth
+- **Testing:** Jest + React Testing Library
 
-## Quick Start
+## 🏗️ Project Structure
+
+```
+mobile/
+├── app/                    # Expo Router screens
+│   ├── (auth)/            # Auth screens (login, signup, onboarding)
+│   ├── (tabs)/            # Main app tabs (dashboard, study, upload, profile)
+│   ├── _layout.tsx        # Root layout with auth protection
+│   └── index.tsx          # Entry point
+├── components/            # Reusable UI components
+│   ├── Button.tsx
+│   ├── Input.tsx
+│   ├── Card.tsx
+│   ├── Text.tsx
+│   └── __tests__/        # Component tests
+├── constants/            # Design system constants
+│   ├── colors.ts
+│   ├── spacing.ts
+│   └── typography.ts
+├── services/             # API services
+│   ├── api.ts           # API client with JWT interceptor
+│   ├── authService.ts
+│   ├── materialsService.ts
+│   └── flashcardsService.ts
+├── stores/               # Zustand state stores
+│   └── authStore.ts
+├── types/                # TypeScript type definitions
+│   └── index.ts
+├── utils/                # Utility functions
+│   └── supabase.ts      # Supabase client
+└── package.json
+```
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
 - Node.js 18+
 - npm or yarn
 - Expo CLI
-- iOS Simulator (Mac only) or Android Studio
-- Expo Go app (for physical device testing)
+- iOS Simulator (Mac) or Android Emulator
 
-### 1. Install Dependencies
+### Installation
 
 ```bash
+cd mobile
 npm install
 ```
 
-### 2. Configure Environment
+### Environment Setup
+
+Create a `.env` file in the `mobile/` directory:
 
 ```bash
-# Copy example env file
-cp .env.example .env
+# API Configuration
+EXPO_PUBLIC_API_URL=http://localhost:8000
 
-# Edit .env
-# Set EXPO_PUBLIC_API_URL to your backend URL
-# (default: http://localhost:8000)
+# Supabase Configuration
+EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key-here
 ```
 
-### 3. Start Development Server
+### Run Development Server
 
 ```bash
 # Start Expo dev server
-npm start
+npx expo start
 
-# Or start for specific platform
-npm run android   # Android
-npm run ios       # iOS (Mac only)
-npm run web       # Web browser
+# For iOS
+npx expo start --ios
+
+# For Android
+npx expo start --android
+
+# For web
+npx expo start --web
 ```
 
-### 4. Run on Device
-
-**Option 1: Physical Device**
-1. Install Expo Go app from App Store or Play Store
-2. Scan QR code from terminal
-3. App will load on your device
-
-**Option 2: Emulator/Simulator**
-```bash
-# Android (requires Android Studio)
-npm run android
-
-# iOS (requires Xcode, Mac only)
-npm run ios
-```
-
-## Project Structure
-
-```
-mobile/
-├── app/                  # Expo Router screens
-│   ├── _layout.tsx      # Root layout
-│   ├── index.tsx        # Home screen
-│   ├── (auth)/          # Auth flow (not authenticated)
-│   └── (tabs)/          # Main app (authenticated)
-├── components/           # Reusable components
-│   ├── ui/              # Base UI components
-│   ├── study/           # Study-specific components
-│   ├── dashboard/       # Dashboard components
-│   └── upload/          # Upload components
-├── services/             # API services
-│   ├── api.ts           # Axios instance
-│   ├── authService.ts
-│   ├── materialsService.ts
-│   └── flashcardsService.ts
-├── stores/               # Zustand stores
-│   ├── authStore.ts
-│   ├── studyStore.ts
-│   └── statsStore.ts
-├── utils/                # Utility functions
-├── constants/            # App constants (colors, spacing, etc.)
-├── types/                # TypeScript types
-├── assets/               # Images, fonts, etc.
-├── app.json              # Expo configuration
-├── package.json          # Dependencies
-├── tailwind.config.js    # Tailwind CSS config
-├── tsconfig.json         # TypeScript config
-└── README.md
-```
-
-## Development
-
-### Running Tests
+### Testing
 
 ```bash
-# Run all tests
+# Run tests
 npm test
 
 # Run tests in watch mode
@@ -117,241 +104,145 @@ npm run test:watch
 npm run test:coverage
 ```
 
-### Code Quality
+## 📂 Features Implemented (Phase 3)
+
+### ✅ Design System
+- Color palette with brand colors
+- Spacing system (4px base grid)
+- Typography scale
+- Reusable components (Button, Input, Card, Text)
+
+### ✅ Authentication
+- Login screen
+- Signup screen
+- Onboarding screen
+- Protected routes
+- Auth state management with Zustand
+- Supabase integration
+
+### ✅ Navigation
+- Bottom tab navigation (Dashboard, Study, Upload, Profile)
+- Stack navigation for auth flow
+- Protected routes middleware
+
+### ✅ Screens
+- Dashboard (empty state with stats placeholders)
+- Study (placeholder for Phase 5)
+- Upload (placeholder for Phase 4)
+- Profile (user info, stats, settings, sign out)
+
+### ✅ API Integration
+- API client with JWT interceptor
+- Auth service
+- Materials service
+- Flashcards service
+
+### ✅ Testing
+- Component tests for Button, Input, Text
+- Test configuration with Jest
+
+## 🎨 Design System
+
+### Colors
+- **Primary:** Purple #A855F7 (innovation & academic)
+- **Success:** Green #10B981
+- **Warning:** Orange #F59E0B
+- **Error:** Red #EF4444
+- **Info:** Blue #3B82F6
+
+### Components
+- **Button:** 3 variants (primary, secondary, outline), 3 sizes (sm, md, lg)
+- **Input:** Text, email, password, number types with error/helper text
+- **Card:** 3 variants (default, elevated, outlined)
+- **Text:** 8 variants (h1, h2, h3, body, bodyLarge, caption, label, button)
+
+## 🔒 Authentication Flow
+
+1. User opens app → redirect to login if not authenticated
+2. Login/Signup → Supabase Auth
+3. Onboarding (optional) → collect subject preference
+4. Redirect to Dashboard → protected tabs
+
+## 📊 State Management
+
+### Auth Store (Zustand)
+- User state
+- Session management
+- Sign in/up/out actions
+- Profile updates
+
+## 🌐 API Services
+
+### API Client
+- Base URL configuration
+- JWT token injection
+- Auto token refresh on 401
+- Error handling
+
+### Services
+- **authService:** User profile management
+- **materialsService:** Upload & extract study materials
+- **flashcardsService:** Generate, CRUD flashcards
+
+## 🧪 Testing Strategy
+
+- **Unit Tests:** Component behavior
+- **Integration Tests:** Auth flow, navigation
+- **Manual Tests:** iOS/Android compatibility
+
+## 📱 Screen Sizes Supported
+
+- **Mobile:** 375px - 428px (iPhone, Android phones)
+- **Tablet:** 768px - 1024px (iPad, Android tablets)
+
+## 🛠️ Development Commands
 
 ```bash
-# Type check
+# Linting
+npm run lint
+npm run lint:fix
+
+# Type checking
 npm run type-check
 
-# Lint
-npm run lint
-
-# Lint and fix
-npm run lint:fix
+# Clean start
+npx expo start --clear
 ```
 
-### Styling with NativeWind
+## 🚧 Coming in Phase 4
 
-NativeWind allows you to use Tailwind CSS classes in React Native:
+- PDF upload & text extraction
+- AI flashcard generation
+- Card preview & editing
+- Material management
 
-```tsx
-import { View, Text } from 'react-native';
+## 🚧 Coming in Phase 5
 
-export default function MyComponent() {
-  return (
-    <View className="flex-1 items-center justify-center bg-primary-500">
-      <Text className="text-2xl font-bold text-white">
-        Hello World
-      </Text>
-    </View>
-  );
-}
-```
+- Study mode with spaced repetition
+- FSRS algorithm integration
+- Card review tracking
+- Progress statistics
 
-Custom colors from `tailwind.config.js`:
-- `primary-500`: #A855F7 (purple)
-- `success-500`: #10B981 (green)
-- `warning-500`: #F59E0B (orange)
-- `error-500`: #EF4444 (red)
-- `neutral-*`: Gray scale
+## 📝 Notes
 
-### Navigation with Expo Router
+- Phase 3 focuses on frontend foundation
+- Backend integration ready (API services implemented)
+- Upload/Study features are placeholders (will be implemented in Phases 4-5)
+- All components follow design system specifications
 
-Expo Router uses file-based routing similar to Next.js:
+## 🤝 Contributing
 
-```
-app/
-├── _layout.tsx          → Root layout
-├── index.tsx            → / (home)
-├── (auth)/
-│   ├── login.tsx        → /auth/login
-│   └── signup.tsx       → /auth/signup
-└── (tabs)/
-    ├── _layout.tsx      → Tab layout
-    ├── index.tsx        → /tabs (dashboard)
-    └── study.tsx        → /tabs/study
-```
+1. Create feature branch
+2. Write code + tests
+3. Run linter & type checker
+4. Test on iOS/Android
+5. Submit PR
 
-Navigate programmatically:
-
-```tsx
-import { useRouter } from 'expo-router';
-
-export default function MyScreen() {
-  const router = useRouter();
-
-  return (
-    <Button onPress={() => router.push('/study')}>
-      Start Studying
-    </Button>
-  );
-}
-```
-
-### State Management with Zustand
-
-Create a store:
-
-```tsx
-// stores/authStore.ts
-import { create } from 'zustand';
-
-interface AuthStore {
-  user: User | null;
-  isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signOut: () => void;
-}
-
-export const useAuthStore = create<AuthStore>((set) => ({
-  user: null,
-  isLoading: false,
-  signIn: async (email, password) => {
-    set({ isLoading: true });
-    // API call
-    set({ user, isLoading: false });
-  },
-  signOut: () => set({ user: null }),
-}));
-```
-
-Use in components:
-
-```tsx
-import { useAuthStore } from '@/stores/authStore';
-
-export default function MyComponent() {
-  const { user, signIn } = useAuthStore();
-
-  return <Text>{user?.name}</Text>;
-}
-```
-
-## API Integration
-
-API client is configured in `services/api.ts`:
-
-```tsx
-import axios from 'axios';
-
-const api = axios.create({
-  baseURL: process.env.EXPO_PUBLIC_API_URL,
-  timeout: 30000,
-});
-
-// Auto-attach JWT token
-api.interceptors.request.use(async (config) => {
-  const token = await getToken(); // from SecureStore
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
-
-export default api;
-```
-
-## Environment Variables
-
-Available environment variables (set in `.env`):
-
-- `EXPO_PUBLIC_API_URL`: Backend API URL (default: http://localhost:8000)
-- `EXPO_PUBLIC_SUPABASE_URL`: Supabase project URL
-- `EXPO_PUBLIC_SUPABASE_ANON_KEY`: Supabase anon key
-- `EXPO_PUBLIC_ENVIRONMENT`: Environment (development, staging, production)
-
-**Note:** Only variables prefixed with `EXPO_PUBLIC_` are accessible in the app.
-
-## Building for Production
-
-### Development Build
-
-```bash
-# Install EAS CLI
-npm install -g eas-cli
-
-# Login to Expo
-eas login
-
-# Configure EAS
-eas build:configure
-
-# Build for iOS
-eas build --platform ios --profile development
-
-# Build for Android
-eas build --platform android --profile development
-```
-
-### Production Build
-
-```bash
-# Build for app stores
-eas build --platform all --profile production
-
-# Submit to App Store
-eas submit --platform ios
-
-# Submit to Google Play
-eas submit --platform android
-```
-
-## Troubleshooting
-
-### Metro Bundler Issues
-
-```bash
-# Clear cache
-npx expo start -c
-
-# Or manually
-rm -rf node_modules
-rm -rf .expo
-npm install
-```
-
-### iOS Simulator Not Working
-
-```bash
-# Open iOS Simulator manually
-open -a Simulator
-
-# Then start Expo
-npm run ios
-```
-
-### Android Emulator Not Working
-
-1. Open Android Studio
-2. Tools → AVD Manager
-3. Start an emulator
-4. Run `npm run android`
-
-### Port Already in Use
-
-```bash
-# Find process using port 8081
-lsof -i :8081
-
-# Kill process
-kill -9 <PID>
-
-# Or use different port
-npx expo start --port 8082
-```
-
-## Learn More
-
-- [Expo Documentation](https://docs.expo.dev/)
-- [React Native Documentation](https://reactnative.dev/)
-- [Expo Router Documentation](https://docs.expo.dev/router/introduction/)
-- [NativeWind Documentation](https://www.nativewind.dev/)
-- [Zustand Documentation](https://docs.pmnd.rs/zustand/getting-started/introduction)
-
-## Contributing
-
-See main [README.md](../README.md) for contribution guidelines.
-
-## License
+## 📄 License
 
 Proprietary - StudyMaster
+
+---
+
+**Phase 3 Status:** ✅ Complete
+**Next Phase:** Phase 4 - AI Flashcard Generation

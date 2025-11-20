@@ -1,18 +1,42 @@
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+import { useEffect } from 'react';
+import { SplashScreen, Stack, router } from 'expo-router';
+import { useAuthStore } from '../stores/authStore';
+
+// Prevent auto-hiding splash screen
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const { initialized, user, initialize } = useAuthStore();
+
+  useEffect(() => {
+    initialize();
+  }, []);
+
+  useEffect(() => {
+    if (initialized) {
+      SplashScreen.hideAsync();
+
+      // Redirect based on auth state
+      if (!user) {
+        router.replace('/(auth)/login');
+      } else {
+        router.replace('/(tabs)');
+      }
+    }
+  }, [initialized, user]);
+
+  if (!initialized) {
+    return null;
+  }
+
   return (
-    <>
-      <StatusBar style="auto" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: '#fff' },
-        }}
-      >
-        <Stack.Screen name="index" />
-      </Stack>
-    </>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Stack.Screen name="(auth)" />
+      <Stack.Screen name="(tabs)" />
+    </Stack>
   );
 }
