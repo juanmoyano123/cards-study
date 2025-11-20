@@ -1,7 +1,7 @@
-# PLAN DE EJECUCIÓN: StudyMaster Medical
+# PLAN DE EJECUCIÓN: StudyMaster
 **PM:** Agent 1 - Product Manager (Senior, 15+ years exp.)
-**Date:** November 11, 2025
-**Version:** 1.0
+**Date:** November 20, 2025
+**Version:** 2.0 - Universal Edition
 **Status:** ✅ Approved for execution
 **Methodology:** Google Project Management + Agile/Scrum
 
@@ -10,16 +10,16 @@
 ## 📋 EXECUTIVE SUMMARY
 
 **Problem:**
-Medical and health science students spend 10+ hours studying inefficiently using passive reading techniques (96% rely on re-reading notes) when active recall with spaced repetition could reduce study time by 70%. Current tools like Anki have a steep learning curve and poor UX, while consumer alternatives like Quizlet lack scientific spaced repetition algorithms.
+Students spend 10+ hours studying inefficiently using passive reading techniques (96% rely on re-reading notes) when active recall with spaced repetition could reduce study time by 70%. Current tools like Anki have a steep learning curve and poor UX, while consumer alternatives like Quizlet lack scientific spaced repetition algorithms.
 
 **Solution:**
-StudyMaster Medical is an AI-powered flashcard platform specifically trained on medical terminology that automatically generates USMLE/NCLEX-style flashcards from uploaded study materials. It combines the scientific rigor of Anki's spaced repetition with modern UX and gamification elements that keep students consistent.
+StudyMaster is an AI-powered flashcard platform that automatically generates smart flashcards from ANY study material (PDFs, textbooks, notes). It combines the scientific rigor of Anki's spaced repetition with modern UX and gamification elements that keep students consistent.
 
 **Primary User:**
-Medical students, nursing students, and pharmacy students in the USA preparing for high-stakes certification exams (450K+ total addressable market).
+University students (18-24 years old) studying any subject who need an efficient way to learn and retain information for exams and long-term knowledge.
 
 **Value Proposition:**
-"We help medical students reduce study time by 70% while improving retention through AI-generated flashcards with clinical context and scientifically-proven spaced repetition."
+"Transform any study material into smart flashcards in seconds. Study less, retain more, with AI-powered learning and scientifically-proven spaced repetition."
 
 **Success Metrics (North Star Metric):**
 - **North Star:** Weekly Active Learners (WAL) completing 50+ cards - Target: 500 users by month 6
@@ -31,51 +31,51 @@ Medical students, nursing students, and pharmacy students in the USA preparing f
 
 ## 👤 USER PERSONA
 
-**Name:** Sarah Chen
-**Age:** 23-27
-**Occupation:** Second-year medical student
-**Location:** University of California Medical School, San Francisco
+**Name:** Alex Rivera
+**Age:** 20-22
+**Occupation:** University student (Computer Science, Business, Liberal Arts, STEM, etc.)
+**Location:** Any major university
 **Tech-savviness:** Level 4/5 (Uses multiple digital tools daily, comfortable with new apps)
-**Market segment size:** 450,000+ medical/nursing/pharmacy students in USA
+**Market segment size:** 20M+ university students worldwide
 
 **Current Pain Points (Jobs-to-be-Done framework):**
 1. **Information Overload** - Severity: 🔴 Critical
-   - Frequency: Daily (300+ pages of material per week)
-   - Current workaround: Re-reading textbooks and notes multiple times
-   - Impact: 10+ hours/day studying with only 30% retention after 48 hours
+   - Frequency: Daily (100-300 pages of material per week across multiple courses)
+   - Current workaround: Re-reading textbooks, notes, and slides multiple times
+   - Impact: 8+ hours/day studying with only 30% retention after 48 hours
 
-2. **Anki Complexity** - Severity: 🟡 High
-   - Frequency: Daily during exam prep
-   - Current workaround: Spending 2-3 hours creating flashcards manually
-   - Impact: Time creating cards instead of studying, frustration with UI
+2. **Manual Flashcard Creation** - Severity: 🟡 High
+   - Frequency: Weekly during exam prep
+   - Current workaround: Spending 1-2 hours creating flashcards manually in Quizlet/Anki
+   - Impact: Time creating cards instead of actually studying, frustration with tedious process
 
 3. **Lack of Study Structure** - Severity: 🟢 Medium
    - Frequency: Every study session
-   - Current workaround: Pomodoro apps + calendar reminders
-   - Impact: Inconsistent study habits, cramming before exams
+   - Current workaround: Pomodoro apps + calendar reminders + random studying
+   - Impact: Inconsistent study habits, cramming before exams, poor retention
 
 **Goals with our product:**
-- 🎯 **Primary (Functional Job):** Pass USMLE Step 1 with score >240 (90th percentile)
-- 🎯 **Secondary (Emotional Job):** Feel confident and prepared without anxiety
-- 🎯 **Social Job:** Be seen as efficient and organized by study group peers
+- 🎯 **Primary (Functional Job):** Pass all courses with good grades while spending less time studying
+- 🎯 **Secondary (Emotional Job):** Feel confident and prepared without anxiety or burnout
+- 🎯 **Social Job:** Have time for social life and extracurriculars while maintaining good grades
 
 **Current Workflow (As-Is):**
 ```
-1. Read lecture slides → Time: 120min → Friction: Passive reading, low retention → Drop-off: 40%
-2. Create Anki cards manually → Time: 90min → Friction: Complex UI, formatting issues → Drop-off: 30%
-3. Review cards → Time: 60min → Friction: Ugly interface, no progress visibility → Drop-off: 25%
+1. Read lecture materials → Time: 120min → Friction: Passive reading, low retention → Drop-off: 40%
+2. Create flashcards manually → Time: 90min → Friction: Tedious, time-consuming → Drop-off: 30%
+3. Review cards → Time: 60min → Friction: No smart scheduling, boring → Drop-off: 25%
 4. Re-read before exam → Time: 180min → Friction: Panic cramming, inefficient → Drop-off: 0%
 ```
 **Total:** 450 minutes (7.5 hours), 4 friction points, 35% effective retention
 
-**Desired Workflow (To-Be - with StudyMaster Medical):**
+**Desired Workflow (To-Be - with StudyMaster):**
 ```
-1. Upload lecture PDF → Time: 2min → Benefit: Instant AI processing
-2. Review & edit AI cards → Time: 10min → Benefit: 90% accurate, medical context
+1. Upload study material (PDF/text) → Time: 2min → Benefit: Instant AI processing
+2. Review & edit AI-generated cards → Time: 10min → Benefit: 85-90% accurate, contextual
 3. Study with spaced repetition → Time: 45min → Benefit: Optimized intervals, gamified
-4. Quick review dashboard → Time: 5min → Benefit: Clear progress, confidence
+4. Quick review dashboard → Time: 5min → Benefit: Clear progress, confidence boost
 ```
-**Total:** 62 minutes (89% faster), 0 friction points, 85% retention rate
+**Total:** 62 minutes (86% faster), 0 friction points, 85% retention rate
 
 **Value Proposition Test:**
 - Current cost: 7.5 hours/day + stress + $25 Anki iOS app
@@ -87,9 +87,9 @@ Medical students, nursing students, and pharmacy students in the USA preparing f
 ## 🗺️ USER JOURNEY MAP
 
 ### Stage 1: Discovery/Awareness
-**Trigger:** Struggling with First Aid textbook, friend mentions StudyMaster
+**Trigger:** Struggling with dense textbook material, friend mentions StudyMaster
 **User actions:** Visits landing page, watches 30-second demo video
-**System response:** Shows medical-specific examples, offers free trial
+**System response:** Shows relevant examples for common subjects, offers free trial
 **Pain points eliminated:** ✅ No more manual card creation
 **Emotional state:** Skeptical → Intrigued
 **Success criteria:** Sign up for free account within 5 minutes
@@ -118,7 +118,7 @@ Medical students, nursing students, and pharmacy students in the USA preparing f
 **Emotional state:** Prepared → Accomplished
 **Success criteria:** Exam score improvement of 15%+, converts to paid
 
-**Final Success Outcome:** Student achieves target USMLE score while studying 70% less
+**Final Success Outcome:** Student achieves target grades while studying 70% less
 
 ---
 
@@ -126,12 +126,12 @@ Medical students, nursing students, and pharmacy students in the USA preparing f
 
 | ID | Feature Name | Priority | **RICE Score** | **Reach** | **Impact** | **Confidence** | **Effort** | Dependencies | User Story (Summary) |
 |----|--------------|----------|----------------|-----------|------------|----------------|------------|--------------|----------------------|
-| F-001 | AI Medical Flashcard Generation | 🔴 P0 | **300** | 100% | 3 (Massive) | 100% | 5d | - | As a medical student I want to upload PDFs to auto-generate accurate flashcards |
+| F-001 | AI Flashcard Generation | 🔴 P0 | **300** | 100% | 3 (Massive) | 100% | 5d | - | As a student I want to upload study materials and auto-generate accurate flashcards |
 | F-002 | FSRS Spaced Repetition System | 🔴 P0 | **240** | 100% | 3 (Massive) | 80% | 4d | F-001 | As a student I want optimal review intervals to maximize retention |
 | F-003 | Study Dashboard with Heatmap | 🔴 P0 | **180** | 100% | 2 (High) | 90% | 3d | F-002 | As a student I want to see my progress to stay motivated |
 | F-004 | Authentication & User Management | 🔴 P0 | **150** | 100% | 2 (High) | 100% | 2d | - | As a user I want secure access to my personal study data |
 | F-005 | Pomodoro Timer Integration | 🟡 P1 | **120** | 80% | 2 (High) | 80% | 2d | F-002 | As a student I want structured study sessions to maintain focus |
-| F-006 | PDF Text Extraction | 🔴 P0 | **133** | 100% | 2 (High) | 100% | 1.5d | - | As a student I want to upload any PDF format to extract content |
+| F-006 | PDF/Text Processing | 🔴 P0 | **133** | 100% | 2 (High) | 100% | 1.5d | - | As a student I want to upload PDFs or paste text to extract content |
 | F-007 | Native Mobile UI Components | 🔴 P0 | **120** | 100% | 2 (High) | 100% | 4d | All | As a student I want native iOS/Android app experience with smooth animations |
 | F-008 | Flashcard Editor | 🟡 P1 | **90** | 90% | 1 (Medium) | 100% | 2d | F-001 | As a student I want to edit AI-generated cards to fix errors |
 | F-009 | Study Analytics | 🟡 P1 | **72** | 60% | 2 (High) | 80% | 3d | F-002 | As a student I want insights into my learning patterns |
@@ -174,48 +174,48 @@ Medical students, nursing students, and pharmacy students in the USA preparing f
 
 ## 📝 FEATURE DETAIL (COMPLETE SPECIFICATION)
 
-### F-001: AI Medical Flashcard Generation
+### F-001: AI Flashcard Generation
 
 **RICE Score Breakdown:**
 - Reach: 100% - Every user needs this to get value
 - Impact: 3 (Massive) - Core differentiator, saves 90 minutes per study session
-- Confidence: 100% - Validated in user interviews, proven tech (GPT-4)
+- Confidence: 100% - Proven technology (GPT-4), validated concept
 - Effort: 5 days - API integration + prompt engineering + UI
 - **Score: (100 × 3 × 100) / 5 = 300**
 
 **User Story:**
 ```
-As a medical student
-I want to upload my lecture PDFs and textbook chapters
+As a student
+I want to upload study materials (PDFs, text) or paste content
 To automatically generate high-quality, context-aware flashcards in minutes instead of hours
 ```
 
 **Business Value:**
-This is THE core differentiator. Anki users spend 2+ hours creating cards manually. We reduce this to 2 minutes. Based on competitor analysis, this feature alone justifies the $9.99/month price point.
+This is THE core differentiator. Manual flashcard creation takes 1-2 hours per study session. We reduce this to 2 minutes. This time savings is the primary value proposition of the entire product.
 
 **Acceptance Criteria (Given-When-Then Scenarios):**
 
-**Scenario 1: Successful PDF upload and generation**
+**Scenario 1: Successful PDF/text upload and generation**
 ```gherkin
 Given I am on the dashboard page
-  And I have a PDF file of medical lecture notes (< 10MB)
-When I click "Upload Study Material" button
-  And I select my PDF file
+  And I have study material (PDF < 10MB or text content)
+When I click "Upload Study Material" or "Paste Text" button
+  And I provide my content
   And I click "Generate Flashcards"
 Then the system shows a progress indicator
   And within 30 seconds, I see a preview of 20-50 generated flashcards
   And each flashcard has a question and answer
-  And medical terms are correctly identified and defined
+  And key concepts are correctly identified and defined
   And I can review each card before saving
 ```
 
 **Scenario 2: AI quality validation**
 ```gherkin
-Given the AI has generated flashcards from my medical PDF
+Given the AI has generated flashcards from my study material
 When I review the generated flashcards
 Then at least 85% of cards are factually accurate
-  And medical terminology is used correctly
-  And questions follow USMLE/NCLEX format patterns
+  And terminology is contextually appropriate for the subject
+  And questions are clear and unambiguous
   And answers are concise (< 100 words)
   And complex concepts are broken into multiple cards
 ```
@@ -266,17 +266,19 @@ Then the system shows "Generation failed, retrying..."
 
 **Data Model:**
 ```sql
--- Study materials table
+-- Study materials table (NO STORAGE OF PDFs - only metadata and extracted text)
 CREATE TABLE study_materials (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES users(id) ON DELETE CASCADE,
   filename TEXT NOT NULL,
-  file_url TEXT NOT NULL,
-  file_size_bytes INTEGER NOT NULL,
+  extracted_text TEXT NOT NULL, -- The actual content extracted from PDF/input
+  word_count INTEGER,
+  subject_category TEXT, -- e.g., "Computer Science", "History", "Biology"
   processed_at TIMESTAMP,
   status TEXT CHECK (status IN ('pending', 'processing', 'completed', 'failed')),
   created_at TIMESTAMP DEFAULT NOW()
 );
+-- NOTE: PDFs are processed and discarded - we only keep the extracted text
 
 -- Generated flashcards table
 CREATE TABLE flashcards (
@@ -295,8 +297,8 @@ CREATE TABLE flashcards (
 
 **External Dependencies:**
 - OpenAI API (GPT-4o-mini for cost efficiency)
-- PDF.js or PyPDF2 for text extraction
-- Supabase Storage for file uploads
+- PDF.js (frontend) or PyPDF2 (backend) for text extraction
+- NO file storage required - PDFs are processed in memory and discarded
 
 **Error Handling:**
 - HTTP 400: Invalid file format
@@ -361,13 +363,13 @@ CREATE TABLE flashcards (
 
 **User Story:**
 ```
-As a medical student
+As a student
 I want the app to show me flashcards at scientifically optimal intervals
 To maximize long-term retention with minimum study time
 ```
 
 **Business Value:**
-Spaced repetition is scientifically proven to improve retention by 200%+. This is what separates us from Quizlet's basic flashcard system. Medical students specifically value this for board exam prep.
+Spaced repetition is scientifically proven to improve retention by 200%+. This is what separates us from Quizlet's basic flashcard system. Students preparing for important exams specifically value this for efficient learning.
 
 **Acceptance Criteria (Given-When-Then Scenarios):**
 
@@ -507,7 +509,7 @@ CREATE INDEX idx_card_reviews_user_date ON card_reviews(user_id, reviewed_at);
 
 **User Story:**
 ```
-As a medical student
+As a student
 I want to see my study progress and consistency visually
 To stay motivated and maintain daily study habits
 ```
@@ -694,19 +696,19 @@ Then I receive reset link within 2 minutes
 ## 🎨 WIREFRAME REQUIREMENTS (FOR UX/UI DESIGNER)
 
 ### Screen 1: Landing Page
-**Purpose:** Convert visitors to signups by showing medical-specific value
+**Purpose:** Convert visitors to signups by showing universal value proposition
 
 **Key elements (Information Hierarchy):**
 - **Hero Section:**
-  - Headline: "AI Flashcards for Medical Students" (48px desktop, 32px mobile)
-  - Subheadline: "Study 70% less, retain 2x more. Built specifically for USMLE & NCLEX."
+  - Headline: "AI-Powered Flashcards for Smarter Studying" (48px desktop, 32px mobile)
+  - Subheadline: "Transform any study material into smart flashcards in seconds. Study less, retain more."
   - CTA Button: "Start Free Trial" (primary color, 56px height)
   - Demo video: 30-second autoplay showing PDF → flashcards
 
 - **Social Proof Section:**
-  - "Trusted by 500+ medical students"
-  - 3 testimonials with photos and medical school names
-  - Rating: "4.9/5 based on 127 reviews"
+  - "Trusted by students worldwide"
+  - 3 testimonials with photos and university names
+  - Rating: "4.9/5 based on user reviews"
 
 - **Feature Grid (3 columns):**
   - AI Generation: Icon + "Turn PDFs into flashcards in seconds"
@@ -726,7 +728,7 @@ Then I receive reset link within 2 minutes
 **Benchmarks from similar products:**
 - RemNote: Clean, academic aesthetic with purple accents
 - Anki: Information-dense but overwhelming
-- Quizlet: Playful but not medical-specific
+- Quizlet: Playful, consumer-friendly aesthetic
 
 ---
 
@@ -904,9 +906,10 @@ Then I receive reset link within 2 minutes
 **Database: PostgreSQL (via Supabase)**
 - Same as dev, seamless migration
 
-**Storage: Supabase Storage**
-- For PDFs and user uploads
-- CDN included
+**File Processing Strategy:**
+- PDFs processed in memory (no persistent storage)
+- Only extracted text stored in PostgreSQL
+- Reduces storage costs and privacy concerns
 
 ### **Development & Deployment Workflow**
 
@@ -959,7 +962,7 @@ OPENAI_API_KEY=sk-...
 **LLM: OpenAI GPT-4o-mini**
 - **Why?**
   - Best cost/performance ratio ($0.15/1M tokens)
-  - Medical terminology understanding out-of-box
+  - General knowledge understanding across all academic subjects
   - Reliable API with 99.9% uptime
 - **Discarded alternatives:**
   - Claude: More expensive, no significant advantage for flashcards
@@ -1037,7 +1040,7 @@ OPENAI_API_KEY=sk-...
 
 ## 📊 SUCCESS METRICS (OKRs WITH BENCHMARKS)
 
-**Objective:** Launch StudyMaster Medical MVP and achieve product-market fit in medical student niche within 6 months
+**Objective:** Launch StudyMaster MVP and achieve product-market fit with university students within 6 months
 
 **North Star Metric:**
 **"Weekly Active Learners (WAL) completing 50+ cards"** - Target: 500 by month 6
@@ -1161,8 +1164,8 @@ OPENAI_API_KEY=sk-...
 **Sprint 1 (Week 1): Market Validation**
 - Landing page creation (web)
 - Reddit/Discord outreach
-- User interviews (10 medical students)
-- **Goal:** 200 waitlist signups
+- User interviews (10 university students across different majors)
+- **Goal:** Initial user feedback and validation
 
 **Sprint 2 (Week 2-3): React Native Foundation**
 - Expo + React Native project setup
@@ -1219,7 +1222,7 @@ OPENAI_API_KEY=sk-...
 **Sprint 9 (Week 11-12): Beta Testing**
 - Expo Development Build creación
 - Beta distribution (TestFlight + Google Play Internal)
-- Onboard 20-50 medical students
+- Onboard 20-50 university students
 - Collect feedback
 - **Goal:** 40% activation, 8/10 quality rating
 
@@ -1255,21 +1258,21 @@ OPENAI_API_KEY=sk-...
 - Impact: Not enough beta testers
 - Mitigation: Paid ads budget ($500) if organic fails
 - Probability: Medium
-- Contingency: Partner with medical school organizations
+- Contingency: Partner with student organizations on campus
 
 ---
 
 ## 🎯 HANDOFF TO UX/UI DESIGNER
 
 **Designer receives:**
-- [x] Detailed user persona (Sarah Chen, medical student)
+- [x] Detailed user persona (Alex Rivera, university student)
 - [x] Complete user journey (4 stages mapped)
 - [x] RICE-prioritized features with specifications
 - [x] Wireframe requirements for 4 core screens
 - [x] Acceptance criteria for all interactions
 - [x] Mobile-first requirements
 - [x] Success metrics to optimize for
-- [x] Tech stack constraints (React + Tailwind)
+- [x] Tech stack constraints (React Native + NativeWind)
 
 **Expected Designer output:**
 1. **Week 1:** Wireframes (low-fi) of 4 core screens
@@ -1280,14 +1283,14 @@ OPENAI_API_KEY=sk-...
 6. **Week 3:** Exported assets (SVGs, images)
 
 **Design Principles:**
-- **Clean & Professional:** Medical students expect serious tools
+- **Clean & Professional:** Students expect serious, focused study tools
 - **Mobile-first:** 60% will study on phones
 - **Accessibility:** WCAG 2.1 AA compliant
-- **Performance:** Lightweight assets, no fancy animations
-- **Brand:** Trustworthy, scientific, but not sterile
+- **Performance:** Lightweight assets, smooth animations
+- **Brand:** Trustworthy, modern, approachable
 
 **Color Palette Suggestion:**
-- Primary: Medical blue (#0066CC)
+- Primary: Modern blue (#0066CC) or purple (#7C3AED)
 - Success: Green (#10B981)
 - Warning: Orange (#F59E0B)
 - Error: Red (#EF4444)
@@ -1296,7 +1299,7 @@ OPENAI_API_KEY=sk-...
 **Typography:**
 - Headlines: Inter or SF Pro Display
 - Body: System fonts for performance
-- Code/Medical terms: Monospace (JetBrains Mono)
+- Code/Technical terms: Monospace (JetBrains Mono)
 
 **Approval criteria:**
 - [ ] All 4 core screens designed
@@ -1313,9 +1316,9 @@ OPENAI_API_KEY=sk-...
 ## 📌 FINAL NOTES
 
 ### **Assumptions:**
-1. Medical students willing to pay $9.99/month - validated by Brainscape's success
-2. OpenAI quality sufficient for medical content - needs testing in beta
-3. 6-8 week timeline achievable with focus - assumes full-time development
+1. University students willing to pay $9.99/month - validated by similar tools (Quizlet Plus, RemNote Pro)
+2. OpenAI quality sufficient for general academic content - needs testing in beta across subjects
+3. 12-14 week timeline achievable with focus - assumes full-time development
 
 ### **Risks:**
 
@@ -1361,11 +1364,11 @@ OPENAI_API_KEY=sk-...
 - OCR for image-based PDFs (Mathpix API)
 
 **V2.0 (3-6 months):**
-- Native mobile apps (React Native)
+- Advanced mobile features
 - Collaborative study groups
 - Advanced analytics with predictions
 - B2B features for institutions
-- Fine-tuned medical LLM
+- Subject-specific fine-tuned models
 
 ### **External Dependencies:**
 
@@ -1378,16 +1381,16 @@ OPENAI_API_KEY=sk-...
 
 ### **Open Questions:**
 
-1. Should we implement subspecialty templates (Cardiology, Neurology)?
-   - Answer: Not in MVP, but collect data on user specialties
+1. Should we implement subject-specific templates (STEM, Humanities, Languages)?
+   - Answer: Not in MVP, use general templates. Collect data on popular subjects
    - Owner: PM to validate in beta
 
-2. How to handle non-English medical content?
-   - Answer: English-only for MVP, Spanish in V2 (large market)
+2. How to handle non-English content?
+   - Answer: English-only for MVP, add Spanish/other languages in V2
    - Owner: PM to survey demand
 
-3. Integration with medical school LMS systems?
-   - Answer: Manual upload only in MVP, explore APIs in V2
+3. Integration with university LMS systems (Canvas, Blackboard)?
+   - Answer: Manual upload only in MVP, explore LMS APIs in V2
    - Owner: Architect in Phase 2
 
 ---
