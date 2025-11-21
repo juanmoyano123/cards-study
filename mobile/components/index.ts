@@ -50,3 +50,9 @@ export type { SwitchSize } from './Switch';
 export { StudyFlashcard } from './StudyFlashcard';
 export { RatingButtons } from './RatingButtons';
 export { StudySessionSummary } from './StudySessionSummary';
+
+// Upload & Generation components
+export { CardPreview } from './CardPreview';
+export type { PreviewCard } from './CardPreview';
+export { EditCardModal } from './EditCardModal';
+export type { EditableCard } from './EditCardModal';
