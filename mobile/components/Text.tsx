@@ -10,6 +10,7 @@ interface TextProps {
   color?: keyof typeof textColors;
   align?: 'left' | 'center' | 'right' | 'justify';
   style?: TextStyle;
+  onPress?: () => void;
 }
 
 const textColors = {
@@ -30,6 +31,7 @@ export const Text: React.FC<TextProps> = ({
   color = 'primary',
   align = 'left',
   style,
+  onPress,
 }) => {
   const textStyle = [
     styles.base,
@@ -39,7 +41,7 @@ export const Text: React.FC<TextProps> = ({
     style,
   ];
 
-  return <RNText style={textStyle}>{children}</RNText>;
+  return <RNText style={textStyle} onPress={onPress}>{children}</RNText>;
 };
 
 const styles = StyleSheet.create({

@@ -61,13 +61,21 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ loading: true });
 
-      const response = await api.post('/auth/register', {
+      const response = await api.post('/auth/signup', {
         email: credentials.email,
         password: credentials.password,
         name: credentials.name,
       });
 
-      const { user, access_token } = response.data;
+      const { access_token } = response.data;
+
+      // Get user data after signup
+      const userResponse = await api.get('/auth/me', {
+        headers: {
+          Authorization: `Bearer ${access_token}`,
+        },
+      });
+      const user = userResponse.data;
 
       // Store token and user
       await AsyncStorage.setItem('auth_token', access_token);
@@ -86,15 +94,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ loading: true });
 
-      // FastAPI expects form data for OAuth2
-      const formData = new FormData();
-      formData.append('username', credentials.email);
-      formData.append('password', credentials.password);
-
-      const response = await api.post('/auth/login', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+      // Send JSON with email field
+      const response = await api.post('/auth/login', {
+        email: credentials.email,
+        password: credentials.password,
       });
 
       const { access_token, token_type } = response.data;

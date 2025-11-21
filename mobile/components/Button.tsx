@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -6,7 +6,10 @@ import {
   StyleSheet,
   ViewStyle,
   TextStyle,
+  Animated,
+  Platform,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { colors, spacing, borderRadius, textStyles } from '../constants';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline';
@@ -22,6 +25,9 @@ interface ButtonProps {
   fullWidth?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  hapticFeedback?: boolean;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -34,8 +40,37 @@ export const Button: React.FC<ButtonProps> = ({
   fullWidth = false,
   style,
   textStyle,
+  accessibilityLabel,
+  accessibilityHint,
+  hapticFeedback = true,
 }) => {
   const isDisabled = disabled || loading;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.97,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  };
+
+  const handlePress = () => {
+    if (hapticFeedback && Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    }
+    onPress();
+  };
 
   const buttonStyle = [
     styles.base,
@@ -55,21 +90,29 @@ export const Button: React.FC<ButtonProps> = ({
   ];
 
   return (
-    <TouchableOpacity
-      onPress={onPress}
-      disabled={isDisabled}
-      style={buttonStyle}
-      activeOpacity={0.7}
-    >
-      {loading ? (
-        <ActivityIndicator
-          color={variant === 'primary' ? colors.white : colors.primary[500]}
-          size="small"
-        />
-      ) : (
-        <Text style={textStyleCombined}>{title}</Text>
-      )}
-    </TouchableOpacity>
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        onPress={handlePress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={isDisabled}
+        style={buttonStyle}
+        activeOpacity={0.9}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel || title}
+        accessibilityHint={accessibilityHint}
+        accessibilityState={{ disabled: isDisabled, busy: loading }}
+      >
+        {loading ? (
+          <ActivityIndicator
+            color={variant === 'primary' ? colors.white : colors.primary[500]}
+            size="small"
+          />
+        ) : (
+          <Text style={textStyleCombined}>{title}</Text>
+        )}
+      </TouchableOpacity>
+    </Animated.View>
   );
 };
 
@@ -78,7 +121,7 @@ const styles = StyleSheet.create({
   base: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: borderRadius.default,
+    borderRadius: 24, // Updated to match design system (full rounded)
     flexDirection: 'row',
     borderWidth: 1,
   },

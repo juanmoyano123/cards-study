@@ -72,6 +72,8 @@ export const Input: React.FC<InputProps> = ({
           autoCapitalize={getAutoCapitalize()}
           autoCorrect={false}
           placeholderTextColor={colors.neutral[400]}
+          editable={true}
+          selectTextOnFocus={true}
           {...props}
         />
 

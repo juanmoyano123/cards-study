@@ -5,29 +5,61 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
 } from 'react-native';
 import { router } from 'expo-router';
-import { Button, Input, Text } from '../../components';
+import { Button, Input, Text, Toast, LoadingOverlay } from '../../components';
 import { useAuthStore } from '../../stores/authStore';
 import { colors, spacing } from '../../constants';
+import { useFormValidation, validators } from '../../hooks/useFormValidation';
 
 export default function LoginScreen() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const { signIn, loading } = useAuthStore();
+  const [toast, setToast] = useState<{
+    visible: boolean;
+    message: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+  }>({ visible: false, message: '', type: 'info' });
+
+  // Form validation setup
+  const form = useFormValidation({
+    email: {
+      validators: [validators.required, validators.email],
+    },
+    password: {
+      validators: [validators.required],
+    },
+  });
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Error', 'Please fill in all fields');
+    // Validate all fields
+    const isValid = form.validateAll();
+
+    if (!isValid) {
+      setToast({
+        visible: true,
+        message: 'Please enter a valid email and password',
+        type: 'error',
+      });
       return;
     }
 
     try {
-      await signIn({ email, password });
+      await signIn({
+        email: form.values.email,
+        password: form.values.password,
+      });
+      setToast({
+        visible: true,
+        message: 'Welcome back!',
+        type: 'success',
+      });
       // Navigation will be handled by the auth state listener
     } catch (error: any) {
-      Alert.alert('Login Failed', error.message || 'An error occurred');
+      setToast({
+        visible: true,
+        message: error.message || 'Login failed. Please check your credentials.',
+        type: 'error',
+      });
     }
   };
 
@@ -35,14 +67,33 @@ export default function LoginScreen() {
     router.push('/(auth)/signup');
   };
 
+  const handleForgotPassword = () => {
+    // TODO: Implement forgot password
+    setToast({
+      visible: true,
+      message: 'Password reset coming soon!',
+      type: 'info',
+    });
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onDismiss={() => setToast({ ...toast, visible: false })}
+      />
+
+      <LoadingOverlay visible={loading} message="Signing in..." />
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
+        keyboardShouldPersistTaps="always"
+        showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
           <Text variant="h1" align="center">
@@ -58,19 +109,32 @@ export default function LoginScreen() {
             label="Email"
             type="email"
             placeholder="your@email.com"
-            value={email}
-            onChangeText={setEmail}
             autoCapitalize="none"
             keyboardType="email-address"
+            accessibilityLabel="Enter your email address"
+            accessibilityHint="The email you used to sign up"
+            {...form.getFieldProps('email')}
           />
 
           <Input
             label="Password"
             type="password"
             placeholder="Enter your password"
-            value={password}
-            onChangeText={setPassword}
+            accessibilityLabel="Enter your password"
+            accessibilityHint="Your account password"
+            {...form.getFieldProps('password')}
           />
+
+          <View style={styles.forgotContainer}>
+            <Text
+              variant="caption"
+              color="brand"
+              style={styles.forgotLink}
+              onPress={handleForgotPassword}
+            >
+              Forgot Password?
+            </Text>
+          </View>
 
           <Button
             title="Sign In"
@@ -78,6 +142,8 @@ export default function LoginScreen() {
             loading={loading}
             fullWidth
             style={styles.loginButton}
+            accessibilityLabel="Sign in button"
+            accessibilityHint="Tap to sign in to your account"
           />
 
           <View style={styles.signupContainer}>
@@ -118,8 +184,17 @@ const styles = StyleSheet.create({
   form: {
     width: '100%',
   },
+  forgotContainer: {
+    alignItems: 'flex-end',
+    marginTop: -spacing[2],
+    marginBottom: spacing[2],
+  },
+  forgotLink: {
+    fontWeight: '500',
+    paddingVertical: spacing[2],
+  },
   loginButton: {
-    marginTop: spacing[6],
+    marginTop: spacing[4],
   },
   signupContainer: {
     flexDirection: 'row',
