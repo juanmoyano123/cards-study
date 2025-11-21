@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import api from '../utils/api';
+import { api } from '../services/api';
+import { secureStorage } from '../utils/secureStorage';
 import type { User, SignUpCredentials, SignInCredentials } from '../types';
 
 interface AuthState {
@@ -27,8 +28,8 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ loading: true });
 
-      // Get stored token and user
-      const token = await AsyncStorage.getItem('auth_token');
+      // Get stored token from secure storage and user from async storage
+      const token = await secureStorage.getItem('auth_token');
       const userJson = await AsyncStorage.getItem('user');
 
       if (token && userJson) {
@@ -42,7 +43,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         } catch (error) {
           // Token invalid, clear auth
           console.error('Token validation failed:', error);
-          await AsyncStorage.removeItem('auth_token');
+          await secureStorage.removeItem('auth_token');
           await AsyncStorage.removeItem('user');
           set({ user: null, token: null });
         }
@@ -77,14 +78,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       });
       const user = userResponse.data;
 
-      // Store token and user
-      await AsyncStorage.setItem('auth_token', access_token);
+      // Store token in secure storage and user in async storage
+      await secureStorage.setItem('auth_token', access_token);
       await AsyncStorage.setItem('user', JSON.stringify(user));
 
       set({ user, token: access_token });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Sign up error:', error);
-      throw new Error(error.response?.data?.detail || 'Sign up failed');
+      const message =
+        error instanceof Error
+          ? error.message
+          : (error as { response?: { data?: { detail?: string } } }).response?.data
+              ?.detail || 'Sign up failed';
+      throw new Error(message);
     } finally {
       set({ loading: false });
     }
@@ -111,14 +117,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
       const user = userResponse.data;
 
-      // Store token and user
-      await AsyncStorage.setItem('auth_token', access_token);
+      // Store token in secure storage and user in async storage
+      await secureStorage.setItem('auth_token', access_token);
       await AsyncStorage.setItem('user', JSON.stringify(user));
 
       set({ user, token: access_token });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Sign in error:', error);
-      throw new Error(error.response?.data?.detail || 'Sign in failed');
+      const message =
+        error instanceof Error
+          ? error.message
+          : (error as { response?: { data?: { detail?: string } } }).response?.data
+              ?.detail || 'Sign in failed';
+      throw new Error(message);
     } finally {
       set({ loading: false });
     }
@@ -129,7 +140,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ loading: true });
 
       // Clear stored data
-      await AsyncStorage.removeItem('auth_token');
+      await secureStorage.removeItem('auth_token');
       await AsyncStorage.removeItem('user');
 
       set({ user: null, token: null });
@@ -152,9 +163,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
 
       set({ user: updatedUser });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Update profile error:', error);
-      throw new Error(error.response?.data?.detail || 'Update failed');
+      const message =
+        error instanceof Error
+          ? error.message
+          : (error as { response?: { data?: { detail?: string } } }).response?.data
+              ?.detail || 'Update failed';
+      throw new Error(message);
     } finally {
       set({ loading: false });
     }

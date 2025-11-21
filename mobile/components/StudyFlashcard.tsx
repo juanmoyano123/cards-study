@@ -4,15 +4,14 @@ import {
   StyleSheet,
   Animated,
   Pressable,
-  Dimensions,
+  useWindowDimensions,
+  Platform,
 } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { Text } from './Text';
 import { Badge } from './Badge';
 import { colors, spacing } from '../constants';
 import type { StudyCard } from '../types';
-
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const CARD_WIDTH = SCREEN_WIDTH - spacing[8];
 
 interface StudyFlashcardProps {
   card: StudyCard;
@@ -22,6 +21,11 @@ interface StudyFlashcardProps {
 
 export function StudyFlashcard({ card, isFlipped, onFlip }: StudyFlashcardProps) {
   const flipAnimation = useRef(new Animated.Value(0)).current;
+  const { width, height } = useWindowDimensions();
+
+  // Responsive card dimensions
+  const cardWidth = Math.min(width - spacing[8], 500); // Max width for tablets
+  const cardHeight = Math.min(height * 0.6, 500); // 60% of screen height, max 500
 
   useEffect(() => {
     Animated.spring(flipAnimation, {
@@ -70,8 +74,15 @@ export function StudyFlashcard({ card, isFlipped, onFlip }: StudyFlashcardProps)
     }
   };
 
+  const handleFlip = () => {
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
+    onFlip();
+  };
+
   return (
-    <Pressable onPress={onFlip} style={styles.container}>
+    <Pressable onPress={handleFlip} style={[styles.container, { width: cardWidth, height: cardHeight }]}>
       {/* Front of card (Question) */}
       <Animated.View
         style={[
@@ -153,8 +164,6 @@ export function StudyFlashcard({ card, isFlipped, onFlip }: StudyFlashcardProps)
 
 const styles = StyleSheet.create({
   container: {
-    width: CARD_WIDTH,
-    height: 400,
     alignSelf: 'center',
   },
   card: {

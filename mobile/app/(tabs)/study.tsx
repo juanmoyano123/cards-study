@@ -39,6 +39,11 @@ export default function StudyScreen() {
     reviewCards,
     overdueCards,
     cardsStudied,
+    sessionStartTime,
+    ratingsAgain,
+    ratingsHard,
+    ratingsGood,
+    ratingsEasy,
     loadQueue,
     flipCard,
     submitReview,
@@ -99,15 +104,18 @@ export default function StudyScreen() {
 
   // Calculate session stats for summary
   const getSessionStats = () => {
-    // In a real implementation, we'd track these during the session
-    // For now, we'll use rough estimates
+    // Calculate actual time spent in session
+    const timeSpentMinutes = sessionStartTime
+      ? Math.floor((Date.now() - sessionStartTime) / (1000 * 60))
+      : 0;
+
     return {
       cardsStudied,
-      cardsAgain: Math.floor(cardsStudied * 0.1),
-      cardsHard: Math.floor(cardsStudied * 0.2),
-      cardsGood: Math.floor(cardsStudied * 0.5),
-      cardsEasy: Math.floor(cardsStudied * 0.2),
-      timeSpentMinutes: Math.floor(cardsStudied * 0.5),
+      cardsAgain: ratingsAgain,
+      cardsHard: ratingsHard,
+      cardsGood: ratingsGood,
+      cardsEasy: ratingsEasy,
+      timeSpentMinutes,
     };
   };
 

@@ -12,11 +12,12 @@ import {
 import * as Haptics from 'expo-haptics';
 import { colors, spacing, borderRadius, textStyles } from '../constants';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps {
-  title: string;
+  title?: string;
+  children?: React.ReactNode;
   onPress: () => void;
   variant?: ButtonVariant;
   size?: ButtonSize;
@@ -32,6 +33,7 @@ interface ButtonProps {
 
 export const Button: React.FC<ButtonProps> = ({
   title,
+  children,
   onPress,
   variant = 'primary',
   size = 'md',
@@ -108,6 +110,8 @@ export const Button: React.FC<ButtonProps> = ({
             color={variant === 'primary' ? colors.white : colors.primary[500]}
             size="small"
           />
+        ) : children ? (
+          children
         ) : (
           <Text style={textStyleCombined}>{title}</Text>
         )}
@@ -138,6 +142,10 @@ const styles = StyleSheet.create({
   outline: {
     backgroundColor: 'transparent',
     borderColor: colors.primary[500],
+  },
+  ghost: {
+    backgroundColor: 'transparent',
+    borderColor: 'transparent',
   },
 
   // Sizes
@@ -180,6 +188,9 @@ const styles = StyleSheet.create({
   },
   outlineText: {
     color: colors.primary[500],
+  },
+  ghostText: {
+    color: colors.neutral[600],
   },
 
   // Size text
