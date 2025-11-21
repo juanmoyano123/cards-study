@@ -11,6 +11,9 @@ interface TextProps {
   align?: 'left' | 'center' | 'right' | 'justify';
   style?: TextStyle;
   onPress?: () => void;
+  numberOfLines?: number;
+  accessibilityLabel?: string;
+  accessibilityRole?: 'text' | 'header' | 'link' | 'button';
 }
 
 const textColors = {
@@ -32,6 +35,9 @@ export const Text: React.FC<TextProps> = ({
   align = 'left',
   style,
   onPress,
+  numberOfLines,
+  accessibilityLabel,
+  accessibilityRole,
 }) => {
   const textStyle = [
     styles.base,
@@ -41,7 +47,25 @@ export const Text: React.FC<TextProps> = ({
     style,
   ];
 
-  return <RNText style={textStyle} onPress={onPress}>{children}</RNText>;
+  // Determine accessibility role based on context
+  const getAccessibilityRole = () => {
+    if (accessibilityRole) return accessibilityRole;
+    if (onPress) return 'button';
+    if (variant === 'h1' || variant === 'h2' || variant === 'h3') return 'header';
+    return 'text';
+  };
+
+  return (
+    <RNText
+      style={textStyle}
+      onPress={onPress}
+      numberOfLines={numberOfLines}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityRole={getAccessibilityRole()}
+    >
+      {children}
+    </RNText>
+  );
 };
 
 const styles = StyleSheet.create({

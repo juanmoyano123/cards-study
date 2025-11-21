@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, StyleSheet, ViewStyle, TouchableOpacity } from 'react-native';
+import React, { useRef } from 'react';
+import { View, StyleSheet, ViewStyle, Animated, Pressable } from 'react-native';
 import { colors, spacing, borderRadius } from '../constants';
 
 interface CardProps {
@@ -8,6 +8,7 @@ interface CardProps {
   padding?: keyof typeof spacing;
   onPress?: () => void;
   style?: ViewStyle;
+  accessibilityLabel?: string;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -16,7 +17,10 @@ export const Card: React.FC<CardProps> = ({
   padding = 5,
   onPress,
   style,
+  accessibilityLabel,
 }) => {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
   const cardStyle = [
     styles.base,
     styles[variant],
@@ -24,15 +28,37 @@ export const Card: React.FC<CardProps> = ({
     style,
   ];
 
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.98,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 50,
+      bounciness: 4,
+    }).start();
+  };
+
   if (onPress) {
     return (
-      <TouchableOpacity
+      <Pressable
         onPress={onPress}
-        style={cardStyle}
-        activeOpacity={0.7}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
       >
-        {children}
-      </TouchableOpacity>
+        <Animated.View style={[cardStyle, { transform: [{ scale: scaleAnim }] }]}>
+          {children}
+        </Animated.View>
+      </Pressable>
     );
   }
 
