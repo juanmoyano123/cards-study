@@ -1,19 +1,28 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Card, Text } from '../../components';
+import { router } from 'expo-router';
+import { BookOpen } from 'lucide-react-native';
+import { EmptyState } from '../../components';
 import { colors, spacing } from '../../constants';
 
 export default function StudyScreen() {
   return (
     <View style={styles.container}>
-      <Card variant="outlined" style={styles.emptyState}>
-        <Text variant="h3" align="center" style={styles.emptyTitle}>
-          No cards to study
-        </Text>
-        <Text variant="body" color="secondary" align="center">
-          Upload some study materials to get started with your learning journey
-        </Text>
-      </Card>
+      <EmptyState
+        icon={BookOpen}
+        iconColor={colors.primary[300]}
+        title="No cards to study"
+        description="Upload some study materials to get started with your learning journey"
+        primaryAction={{
+          label: 'Upload Materials',
+          onPress: () => router.push('/(tabs)/upload'),
+        }}
+        secondaryAction={{
+          label: 'Go to Dashboard',
+          onPress: () => router.push('/(tabs)/'),
+        }}
+        tip="Tip: You can upload PDFs, images, or create cards manually"
+      />
     </View>
   );
 }
@@ -24,11 +33,5 @@ const styles = StyleSheet.create({
     backgroundColor: colors.neutral[50],
     padding: spacing[4],
     justifyContent: 'center',
-  },
-  emptyState: {
-    padding: spacing[6],
-  },
-  emptyTitle: {
-    marginBottom: spacing[2],
   },
 });

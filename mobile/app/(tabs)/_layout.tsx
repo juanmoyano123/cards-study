@@ -1,11 +1,13 @@
 import { Tabs, router } from 'expo-router';
 import { Home, BookOpen, Upload, User } from 'lucide-react-native';
 import { useEffect } from 'react';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../stores/authStore';
 import { colors } from '../../constants';
 
 export default function TabsLayout() {
   const { user } = useAuthStore();
+  const insets = useSafeAreaInsets();
 
   useEffect(() => {
     if (!user) {
@@ -25,9 +27,14 @@ export default function TabsLayout() {
         tabBarStyle: {
           borderTopColor: colors.border.light,
           borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
+          height: 60 + insets.bottom,
+          paddingBottom: 8 + insets.bottom,
           paddingTop: 8,
+        },
+        tabBarShowLabel: true,
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
         },
         headerShown: true,
         headerStyle: {

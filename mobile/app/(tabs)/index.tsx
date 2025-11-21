@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, ScrollView } from 'react-native';
 import { router } from 'expo-router';
+import { FileText } from 'lucide-react-native';
 import { Card, Text, Button } from '../../components';
 import { useAuthStore } from '../../stores/authStore';
 import { colors, spacing } from '../../constants';
@@ -55,6 +56,9 @@ export default function DashboardScreen() {
 
       {/* Empty State */}
       <Card variant="outlined" style={styles.emptyState}>
+        <View style={styles.emptyIconContainer}>
+          <FileText size={64} color={colors.neutral[300]} />
+        </View>
         <Text variant="h3" align="center" style={styles.emptyTitle}>
           No flashcards yet
         </Text>
@@ -154,6 +158,10 @@ const styles = StyleSheet.create({
   emptyState: {
     padding: spacing[6],
     marginBottom: spacing[6],
+  },
+  emptyIconContainer: {
+    alignItems: 'center',
+    marginBottom: spacing[4],
   },
   emptyTitle: {
     marginBottom: spacing[2],

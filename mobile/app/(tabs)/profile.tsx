@@ -1,12 +1,27 @@
-import React from 'react';
-import { View, StyleSheet, ScrollView, Alert } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
-import { Card, Text, Button } from '../../components';
+import { ChevronRight, User, Bell, Settings } from 'lucide-react-native';
+import { Card, Text, Button, Toast } from '../../components';
 import { useAuthStore } from '../../stores/authStore';
 import { colors, spacing } from '../../constants';
 
 export default function ProfileScreen() {
   const { user, signOut, loading } = useAuthStore();
+  const [toast, setToast] = useState<{
+    visible: boolean;
+    message: string;
+    type: 'success' | 'error' | 'warning' | 'info';
+  }>({ visible: false, message: '', type: 'info' });
+
+  const handleSettingPress = (setting: string) => {
+    // TODO: Navigate to setting screens when implemented
+    setToast({
+      visible: true,
+      message: `${setting} settings coming soon!`,
+      type: 'info',
+    });
+  };
 
   const handleSignOut = async () => {
     Alert.alert('Sign Out', 'Are you sure you want to sign out?', [
@@ -31,6 +46,13 @@ export default function ProfileScreen() {
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onDismiss={() => setToast({ ...toast, visible: false })}
+      />
+
       {/* User Info Card */}
       <Card variant="elevated" style={styles.userCard}>
         <View style={styles.avatar}>
@@ -105,26 +127,59 @@ export default function ProfileScreen() {
           Settings
         </Text>
 
-        <View style={styles.settingRow}>
-          <Text variant="body">Account</Text>
-          <Text variant="caption" color="secondary">
-            Manage your account
-          </Text>
-        </View>
+        <TouchableOpacity
+          style={styles.settingRow}
+          onPress={() => handleSettingPress('Account')}
+          accessibilityRole="button"
+          accessibilityLabel="Account settings"
+        >
+          <View style={styles.settingIcon}>
+            <User size={20} color={colors.neutral[500]} />
+          </View>
+          <View style={styles.settingContent}>
+            <Text variant="body">Account</Text>
+            <Text variant="caption" color="secondary">
+              Manage your account
+            </Text>
+          </View>
+          <ChevronRight size={20} color={colors.neutral[400]} />
+        </TouchableOpacity>
 
-        <View style={styles.settingRow}>
-          <Text variant="body">Notifications</Text>
-          <Text variant="caption" color="secondary">
-            Configure reminders
-          </Text>
-        </View>
+        <TouchableOpacity
+          style={styles.settingRow}
+          onPress={() => handleSettingPress('Notifications')}
+          accessibilityRole="button"
+          accessibilityLabel="Notification settings"
+        >
+          <View style={styles.settingIcon}>
+            <Bell size={20} color={colors.neutral[500]} />
+          </View>
+          <View style={styles.settingContent}>
+            <Text variant="body">Notifications</Text>
+            <Text variant="caption" color="secondary">
+              Configure reminders
+            </Text>
+          </View>
+          <ChevronRight size={20} color={colors.neutral[400]} />
+        </TouchableOpacity>
 
-        <View style={styles.settingRow}>
-          <Text variant="body">Study Preferences</Text>
-          <Text variant="caption" color="secondary">
-            Customize your learning
-          </Text>
-        </View>
+        <TouchableOpacity
+          style={[styles.settingRow, styles.settingRowLast]}
+          onPress={() => handleSettingPress('Study Preferences')}
+          accessibilityRole="button"
+          accessibilityLabel="Study preferences settings"
+        >
+          <View style={styles.settingIcon}>
+            <Settings size={20} color={colors.neutral[500]} />
+          </View>
+          <View style={styles.settingContent}>
+            <Text variant="body">Study Preferences</Text>
+            <Text variant="caption" color="secondary">
+              Customize your learning
+            </Text>
+          </View>
+          <ChevronRight size={20} color={colors.neutral[400]} />
+        </TouchableOpacity>
       </Card>
 
       {/* Sign Out Button */}
@@ -200,9 +255,20 @@ const styles = StyleSheet.create({
     marginBottom: spacing[6],
   },
   settingRow: {
-    paddingVertical: spacing[3],
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: spacing[4],
     borderBottomWidth: 1,
     borderBottomColor: colors.border.light,
+  },
+  settingRowLast: {
+    borderBottomWidth: 0,
+  },
+  settingIcon: {
+    marginRight: spacing[3],
+  },
+  settingContent: {
+    flex: 1,
   },
   signOutButton: {
     marginBottom: spacing[4],
