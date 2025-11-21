@@ -141,3 +141,58 @@ export interface PaginatedResponse<T> {
   per_page: number;
   total_pages: number;
 }
+
+// Study Mode types
+export interface StudyCard {
+  id: string;
+  question: string;
+  answer: string;
+  explanation?: string;
+  tags?: string[];
+  difficulty: number;
+  interval_days: number;
+  ease_factor: number;
+  review_count: number;
+  mastery_level: 'new' | 'learning' | 'young' | 'mature' | 'mastered';
+  next_intervals: {
+    1: string;
+    2: string;
+    3: string;
+    4: string;
+  };
+}
+
+export interface StudyQueueResponse {
+  cards: StudyCard[];
+  total_due: number;
+  new_cards: number;
+  review_cards: number;
+  overdue_cards: number;
+}
+
+export interface ReviewRequest {
+  card_id: string;
+  rating: 1 | 2 | 3 | 4;
+  time_spent_seconds?: number;
+}
+
+export interface ReviewResponse {
+  success: boolean;
+  card_id: string;
+  new_interval_days: number;
+  new_ease_factor: number;
+  new_due_date: string;
+  mastery_level: string;
+  cards_remaining: number;
+}
+
+export interface SessionSummary {
+  session_id: string;
+  cards_studied: number;
+  cards_again: number;
+  cards_hard: number;
+  cards_good: number;
+  cards_easy: number;
+  time_spent_minutes: number;
+  streak_day: number;
+}
