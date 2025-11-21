@@ -2,7 +2,7 @@
 CardStats model - Tracks FSRS algorithm state for each card.
 """
 
-from sqlalchemy import Column, Integer, Float, Date, DateTime, ForeignKey, CheckConstraint
+from sqlalchemy import Column, Integer, Float, String, Date, DateTime, ForeignKey, CheckConstraint
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
@@ -38,7 +38,7 @@ class CardStats(Base):
 
     # Mastery tracking
     mastery_level = Column(
-        Column.VARCHAR(20),
+        String(20),
         CheckConstraint("mastery_level IN ('new', 'learning', 'young', 'mature', 'mastered')"),
         default="new"
     )

@@ -1,11 +1,11 @@
 import { create } from 'zustand';
-import { supabase } from '../utils/supabase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../utils/api';
 import type { User, SignUpCredentials, SignInCredentials } from '../types';
-import type { Session } from '@supabase/supabase-js';
 
 interface AuthState {
   user: User | null;
-  session: Session | null;
+  token: string | null;
   loading: boolean;
   initialized: boolean;
 
@@ -19,7 +19,7 @@ interface AuthState {
 
 export const useAuthStore = create<AuthState>((set, get) => ({
   user: null,
-  session: null,
+  token: null,
   loading: false,
   initialized: false,
 
@@ -27,48 +27,31 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ loading: true });
 
-      // Get current session
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      // Get stored token and user
+      const token = await AsyncStorage.getItem('auth_token');
+      const userJson = await AsyncStorage.getItem('user');
 
-      if (session?.user) {
-        // Fetch user profile from your backend
-        const user: User = {
-          id: session.user.id,
-          email: session.user.email || '',
-          name: session.user.user_metadata?.name,
-          subject: session.user.user_metadata?.subject,
-          created_at: session.user.created_at || '',
-          updated_at: session.user.updated_at || '',
-        };
+      if (token && userJson) {
+        const user = JSON.parse(userJson);
+        set({ user, token, initialized: true });
 
-        set({ user, session, initialized: true });
-      } else {
-        set({ user: null, session: null, initialized: true });
-      }
-
-      // Listen for auth changes
-      supabase.auth.onAuthStateChange(async (event, session) => {
-        console.log('Auth state changed:', event);
-
-        if (session?.user) {
-          const user: User = {
-            id: session.user.id,
-            email: session.user.email || '',
-            name: session.user.user_metadata?.name,
-            subject: session.user.user_metadata?.subject,
-            created_at: session.user.created_at || '',
-            updated_at: session.user.updated_at || '',
-          };
-          set({ user, session });
-        } else {
-          set({ user: null, session: null });
+        // Optionally verify token with backend
+        try {
+          const response = await api.get('/auth/me');
+          set({ user: response.data });
+        } catch (error) {
+          // Token invalid, clear auth
+          console.error('Token validation failed:', error);
+          await AsyncStorage.removeItem('auth_token');
+          await AsyncStorage.removeItem('user');
+          set({ user: null, token: null });
         }
-      });
+      } else {
+        set({ user: null, token: null, initialized: true });
+      }
     } catch (error) {
       console.error('Failed to initialize auth:', error);
-      set({ user: null, session: null, initialized: true });
+      set({ user: null, token: null, initialized: true });
     } finally {
       set({ loading: false });
     }
@@ -78,32 +61,22 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ loading: true });
 
-      const { data, error } = await supabase.auth.signUp({
+      const response = await api.post('/auth/register', {
         email: credentials.email,
         password: credentials.password,
-        options: {
-          data: {
-            name: credentials.name,
-          },
-        },
+        name: credentials.name,
       });
 
-      if (error) throw error;
+      const { user, access_token } = response.data;
 
-      if (data.user) {
-        const user: User = {
-          id: data.user.id,
-          email: data.user.email || '',
-          name: credentials.name,
-          created_at: data.user.created_at || '',
-          updated_at: data.user.updated_at || '',
-        };
+      // Store token and user
+      await AsyncStorage.setItem('auth_token', access_token);
+      await AsyncStorage.setItem('user', JSON.stringify(user));
 
-        set({ user, session: data.session });
-      }
-    } catch (error) {
+      set({ user, token: access_token });
+    } catch (error: any) {
       console.error('Sign up error:', error);
-      throw error;
+      throw new Error(error.response?.data?.detail || 'Sign up failed');
     } finally {
       set({ loading: false });
     }
@@ -113,28 +86,36 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ loading: true });
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: credentials.email,
-        password: credentials.password,
+      // FastAPI expects form data for OAuth2
+      const formData = new FormData();
+      formData.append('username', credentials.email);
+      formData.append('password', credentials.password);
+
+      const response = await api.post('/auth/login', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
 
-      if (error) throw error;
+      const { access_token, token_type } = response.data;
 
-      if (data.user) {
-        const user: User = {
-          id: data.user.id,
-          email: data.user.email || '',
-          name: data.user.user_metadata?.name,
-          subject: data.user.user_metadata?.subject,
-          created_at: data.user.created_at || '',
-          updated_at: data.user.updated_at || '',
-        };
+      // Get user data
+      const userResponse = await api.get('/auth/me', {
+        headers: {
+          Authorization: `${token_type} ${access_token}`,
+        },
+      });
 
-        set({ user, session: data.session });
-      }
-    } catch (error) {
+      const user = userResponse.data;
+
+      // Store token and user
+      await AsyncStorage.setItem('auth_token', access_token);
+      await AsyncStorage.setItem('user', JSON.stringify(user));
+
+      set({ user, token: access_token });
+    } catch (error: any) {
       console.error('Sign in error:', error);
-      throw error;
+      throw new Error(error.response?.data?.detail || 'Sign in failed');
     } finally {
       set({ loading: false });
     }
@@ -144,10 +125,11 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ loading: true });
 
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      // Clear stored data
+      await AsyncStorage.removeItem('auth_token');
+      await AsyncStorage.removeItem('user');
 
-      set({ user: null, session: null });
+      set({ user: null, token: null });
     } catch (error) {
       console.error('Sign out error:', error);
       throw error;
@@ -160,28 +142,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ loading: true });
 
-      const { error } = await supabase.auth.updateUser({
-        data: {
-          name: data.name,
-          subject: data.subject,
-        },
-      });
+      const response = await api.put('/users/me', data);
+      const updatedUser = response.data;
 
-      if (error) throw error;
+      // Update stored user
+      await AsyncStorage.setItem('user', JSON.stringify(updatedUser));
 
-      // Update local state
-      const currentUser = get().user;
-      if (currentUser) {
-        set({
-          user: {
-            ...currentUser,
-            ...data,
-          },
-        });
-      }
-    } catch (error) {
+      set({ user: updatedUser });
+    } catch (error: any) {
       console.error('Update profile error:', error);
-      throw error;
+      throw new Error(error.response?.data?.detail || 'Update failed');
     } finally {
       set({ loading: false });
     }
