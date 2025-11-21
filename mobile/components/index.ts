@@ -25,3 +25,23 @@ export { NetworkError } from './NetworkError';
 export { Skeleton, SkeletonText, SkeletonCard, SkeletonStats, SkeletonAvatar } from './Skeleton';
 
 export { EmptyState } from './EmptyState';
+
+export { Modal } from './Modal';
+export type { ModalSize } from './Modal';
+
+export { Checkbox } from './Checkbox';
+export type { CheckboxSize } from './Checkbox';
+
+export { Select } from './Select';
+export type { SelectOption } from './Select';
+
+export { Textarea } from './Textarea';
+
+export { Badge, DotBadge } from './Badge';
+export type { BadgeVariant, BadgeSize } from './Badge';
+
+export { ProgressBar, ProgressCircle } from './Progress';
+export type { ProgressVariant, ProgressSize } from './Progress';
+
+export { Switch } from './Switch';
+export type { SwitchSize } from './Switch';
