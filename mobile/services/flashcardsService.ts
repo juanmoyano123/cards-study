@@ -112,4 +112,16 @@ export const flashcardsService = {
 
     return response.data.data!;
   },
+
+  /**
+   * Confirm draft flashcards (activate them for study)
+   */
+  async confirmFlashcards(flashcardIds: string[]): Promise<{ confirmed_count: number }> {
+    const response = await api.post<{ confirmed_count: number; message: string }>(
+      '/flashcards/confirm',
+      { flashcard_ids: flashcardIds }
+    );
+
+    return response.data;
+  },
 };

@@ -14,11 +14,18 @@ from app.schemas.flashcard import (
     FlashcardResponse,
     FlashcardListResponse,
     FlashcardConfirmRequest,
+    FlashcardGenerateRequest,
+    FlashcardGenerateResponse,
 )
 from app.utils.database import get_db
 from app.utils.auth import get_current_user_id
 from app.models.flashcard import Flashcard
 from app.models.card_stats import CardStats
+from app.models.study_material import StudyMaterial
+from app.services.openai_service import openai_service
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -254,6 +261,131 @@ async def delete_flashcard(
     return None
 
 
+@router.post("/generate", response_model=FlashcardGenerateResponse)
+async def generate_flashcards(
+    request: FlashcardGenerateRequest,
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Generate flashcards from a study material using AI.
+
+    - **material_id**: ID of the source material
+    - **card_count**: Number of flashcards to generate (default: 20, max: 100)
+    - **difficulty**: Optional difficulty filter (1-5)
+
+    Generated cards are created with status "draft" for preview.
+    Use POST /flashcards/confirm to activate them.
+
+    Requires authentication and ownership of the material.
+    """
+    user_uuid = uuid.UUID(user_id)
+
+    # Get the material
+    material = db.query(StudyMaterial).filter(
+        StudyMaterial.id == request.material_id,
+        StudyMaterial.user_id == user_uuid,
+        StudyMaterial.deleted_at.is_(None)
+    ).first()
+
+    if not material:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Study material not found"
+        )
+
+    # Validate material has text
+    if not material.extracted_text or len(material.extracted_text.strip()) < 50:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Material does not contain sufficient text for generation"
+        )
+
+    try:
+        # Map difficulty number to difficulty string for OpenAI service
+        difficulty_map = {1: "easy", 2: "easy", 3: "medium", 4: "hard", 5: "hard"}
+        difficulty_str = difficulty_map.get(request.difficulty) if request.difficulty else None
+
+        # Generate flashcards using OpenAI
+        logger.info(
+            f"Generating {request.card_count} flashcards for material {request.material_id}"
+        )
+
+        generated_cards = await openai_service.generate_flashcards(
+            text=material.extracted_text,
+            count=request.card_count,
+            difficulty=difficulty_str,
+            subject=material.subject_category,
+            ai_confidence=0.85  # Base confidence score
+        )
+
+        # Create flashcards in database with "draft" status
+        created_flashcards = []
+
+        for card_data in generated_cards:
+            flashcard = Flashcard(
+                user_id=user_uuid,
+                material_id=request.material_id,
+                question=card_data['question'],
+                answer=card_data['answer'],
+                explanation=card_data.get('explanation'),
+                tags=card_data.get('tags', []),
+                difficulty=card_data.get('difficulty', 3),
+                ai_confidence=card_data.get('ai_confidence', 0.85),
+                is_edited=False,
+                status="draft"  # AI-generated cards start as draft
+            )
+
+            db.add(flashcard)
+            db.flush()  # Get the ID
+
+            # Create card stats (but not due yet since it's draft)
+            card_stats = CardStats(
+                card_id=flashcard.id,
+                user_id=user_uuid,
+                due_date=None  # Will be set when confirmed
+            )
+            db.add(card_stats)
+
+            created_flashcards.append(flashcard)
+
+        db.commit()
+
+        # Refresh all flashcards to get updated data
+        for flashcard in created_flashcards:
+            db.refresh(flashcard)
+
+        # Update user stats
+        from app.models.user_stats import UserStats
+        user_stats = db.query(UserStats).filter(UserStats.user_id == user_uuid).first()
+        if user_stats:
+            user_stats.total_flashcards_created += len(created_flashcards)
+            db.commit()
+
+        logger.info(f"Successfully created {len(created_flashcards)} draft flashcards")
+
+        return FlashcardGenerateResponse(
+            flashcards=[FlashcardResponse.from_attributes(f) for f in created_flashcards],
+            material_id=request.material_id,
+            total_generated=len(created_flashcards),
+            status="success"
+        )
+
+    except ValueError as e:
+        logger.error(f"Validation error during generation: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
+
+    except Exception as e:
+        logger.error(f"Error generating flashcards: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate flashcards: {str(e)}"
+        )
+
+
 @router.post("/confirm", status_code=status.HTTP_200_OK)
 async def confirm_flashcards(
     request: FlashcardConfirmRequest,
@@ -279,6 +411,23 @@ async def confirm_flashcards(
 
         if flashcard:
             flashcard.status = "active"
+
+            # Set due date for the card stats when confirming
+            card_stats = db.query(CardStats).filter(
+                CardStats.card_id == flashcard_id
+            ).first()
+
+            if card_stats and card_stats.due_date is None:
+                card_stats.due_date = date.today()  # Available for study immediately
+
+                # Update user card counts
+                from app.models.user_stats import UserStats
+                user_stats = db.query(UserStats).filter(
+                    UserStats.user_id == uuid.UUID(user_id)
+                ).first()
+                if user_stats:
+                    user_stats.cards_new += 1
+
             confirmed_count += 1
 
     db.commit()

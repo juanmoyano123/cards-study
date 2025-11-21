@@ -2,7 +2,7 @@
 Materials routes - CRUD operations for study materials.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, status, Query, UploadFile, File, Form
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import uuid
@@ -17,6 +17,10 @@ from app.schemas.material import (
 from app.utils.database import get_db
 from app.utils.auth import get_current_user_id
 from app.models.study_material import StudyMaterial
+from app.services.pdf_service import pdf_service
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -64,6 +68,156 @@ async def create_material(
         db.commit()
 
     return MaterialResponse.from_orm(material)
+
+
+@router.post("/upload", response_model=MaterialResponse, status_code=status.HTTP_201_CREATED)
+async def upload_material(
+    file: Optional[UploadFile] = File(None),
+    text: Optional[str] = Form(None),
+    filename: str = Form(...),
+    subject_category: Optional[str] = Form(None),
+    tags: Optional[str] = Form(None),  # JSON string of array
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Upload a study material - either PDF file or pasted text.
+
+    Two modes:
+    1. PDF Upload: Provide file (PDF), extracts text automatically
+    2. Text Paste: Provide text directly (no file)
+
+    - **file**: Optional PDF file (max 10MB)
+    - **text**: Optional text content (use if no file)
+    - **filename**: Name for the material
+    - **subject_category**: Optional subject category
+    - **tags**: Optional tags as JSON array string (e.g., '["tag1", "tag2"]')
+
+    Must provide either file OR text, not both.
+
+    Requires authentication.
+    """
+    user_uuid = uuid.UUID(user_id)
+
+    # Validate that exactly one input method is provided
+    if file and text:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Provide either file OR text, not both"
+        )
+
+    if not file and not text:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Must provide either a PDF file or text content"
+        )
+
+    # Parse tags if provided
+    parsed_tags = []
+    if tags:
+        try:
+            import json
+            parsed_tags = json.loads(tags)
+            if not isinstance(parsed_tags, list):
+                raise ValueError("Tags must be an array")
+        except Exception as e:
+            logger.warning(f"Failed to parse tags: {e}")
+            parsed_tags = []
+
+    extracted_text = None
+    error_message = None
+
+    try:
+        # Handle PDF file upload
+        if file:
+            # Validate file type
+            if not file.filename.lower().endswith('.pdf'):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Only PDF files are supported"
+                )
+
+            logger.info(f"Processing PDF upload: {file.filename}")
+
+            # Read file bytes
+            file_bytes = await file.read()
+
+            # Extract text using PDF service
+            try:
+                extracted_text = pdf_service.extract_text_from_pdf(file_bytes)
+
+                # Get stats
+                stats = pdf_service.get_text_stats(extracted_text)
+                logger.info(
+                    f"Extracted {stats['word_count']} words from PDF "
+                    f"(~{stats['estimated_reading_time_minutes']} min read)"
+                )
+
+            except ValueError as e:
+                # PDF processing error (file too large, encrypted, etc.)
+                error_message = str(e)
+                logger.error(f"PDF processing error: {e}")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail=error_message
+                )
+
+        # Handle pasted text
+        else:
+            extracted_text = text.strip()
+
+            # Validate text length
+            if len(extracted_text) < 50:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Text must be at least 50 characters long"
+                )
+
+            logger.info(f"Processing pasted text: {len(extracted_text)} characters")
+
+        # Count words
+        word_count = len(extracted_text.split())
+
+        # Create material
+        material = StudyMaterial(
+            user_id=user_uuid,
+            filename=filename,
+            extracted_text=extracted_text,
+            word_count=word_count,
+            subject_category=subject_category,
+            tags=parsed_tags,
+            status="completed",
+            processed_at=datetime.utcnow(),
+            error_message=error_message
+        )
+
+        db.add(material)
+        db.commit()
+        db.refresh(material)
+
+        # Update user stats
+        from app.models.user_stats import UserStats
+        user_stats = db.query(UserStats).filter(
+            UserStats.user_id == user_uuid
+        ).first()
+
+        if user_stats:
+            user_stats.total_materials_uploaded += 1
+            db.commit()
+
+        logger.info(f"Successfully created material {material.id} with {word_count} words")
+
+        return MaterialResponse.from_orm(material)
+
+    except HTTPException:
+        raise
+
+    except Exception as e:
+        logger.error(f"Error uploading material: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to process material: {str(e)}"
+        )
 
 
 @router.get("", response_model=MaterialListResponse)

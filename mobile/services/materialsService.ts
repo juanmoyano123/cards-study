@@ -1,25 +1,30 @@
 import { api } from './api';
 import type { StudyMaterial, ApiResponse, PaginatedResponse } from '../types';
 
-export interface ExtractTextRequest {
+export interface UploadMaterialRequest {
   file?: any; // File from expo-document-picker
   text?: string;
-  title?: string;
-  subject?: string;
+  filename: string;
+  subject_category?: string;
+  tags?: string[];
 }
 
-export interface ExtractTextResponse {
-  material_id: string;
-  title: string;
+export interface UploadMaterialResponse {
+  id: string;
+  filename: string;
   extracted_text: string;
   word_count: number;
+  subject_category?: string;
+  tags: string[];
+  status: string;
+  created_at: string;
 }
 
 export const materialsService = {
   /**
-   * Extract text from PDF or accept manual text
+   * Upload a PDF file or paste text to create a study material
    */
-  async extractText(request: ExtractTextRequest): Promise<ExtractTextResponse> {
+  async uploadMaterial(request: UploadMaterialRequest): Promise<UploadMaterialResponse> {
     const formData = new FormData();
 
     if (request.file) {
@@ -34,16 +39,18 @@ export const materialsService = {
       formData.append('text', request.text);
     }
 
-    if (request.title) {
-      formData.append('title', request.title);
+    formData.append('filename', request.filename);
+
+    if (request.subject_category) {
+      formData.append('subject_category', request.subject_category);
     }
 
-    if (request.subject) {
-      formData.append('subject', request.subject);
+    if (request.tags && request.tags.length > 0) {
+      formData.append('tags', JSON.stringify(request.tags));
     }
 
-    const response = await api.post<ApiResponse<ExtractTextResponse>>(
-      '/materials/extract',
+    const response = await api.post<UploadMaterialResponse>(
+      '/materials/upload',
       formData,
       {
         headers: {
@@ -52,11 +59,7 @@ export const materialsService = {
       }
     );
 
-    if (response.data.error) {
-      throw new Error(response.data.error);
-    }
-
-    return response.data.data!;
+    return response.data;
   },
 
   /**
