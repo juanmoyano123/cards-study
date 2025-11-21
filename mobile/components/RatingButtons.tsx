@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Pressable, Animated } from 'react-native';
+import { View, StyleSheet, Pressable, Animated, Platform } from 'react-native';
 import { Text } from './Text';
 import { colors, spacing } from '../constants';
 import * as Haptics from 'expo-haptics';
@@ -84,8 +84,10 @@ function RatingButton({
   };
 
   const handlePress = () => {
-    // Haptic feedback
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    // Haptic feedback on native platforms
+    if (Platform.OS !== 'web') {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    }
     onPress();
   };
 

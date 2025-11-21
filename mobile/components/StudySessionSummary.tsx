@@ -100,18 +100,16 @@ export function StudySessionSummary({
 
       <View style={styles.actions}>
         <Button
+          title="Study More Cards"
           variant="primary"
           onPress={onContinue}
           style={styles.primaryButton}
-        >
-          Study More Cards
-        </Button>
+        />
         <Button
+          title="Go to Dashboard"
           variant="outline"
           onPress={onGoToDashboard}
-        >
-          Go to Dashboard
-        </Button>
+        />
       </View>
     </View>
   );

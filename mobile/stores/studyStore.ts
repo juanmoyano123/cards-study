@@ -25,6 +25,13 @@ interface StudyState {
   overdueCards: number;
   cardsStudied: number;
   sessionStartTime: number | null;
+  cardStartTime: number | null;
+
+  // Rating breakdown tracking
+  ratingsAgain: number;
+  ratingsHard: number;
+  ratingsGood: number;
+  ratingsEasy: number;
 
   // Session summary (after completing)
   sessionSummary: SessionSummary | null;
@@ -62,6 +69,11 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   overdueCards: 0,
   cardsStudied: 0,
   sessionStartTime: null,
+  cardStartTime: null,
+  ratingsAgain: 0,
+  ratingsHard: 0,
+  ratingsGood: 0,
+  ratingsEasy: 0,
   sessionSummary: null,
 
   loadQueue: async (options) => {
@@ -80,11 +92,18 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         isFlipped: false,
         cardsStudied: 0,
         sessionStartTime: Date.now(),
+        cardStartTime: Date.now(),
+        ratingsAgain: 0,
+        ratingsHard: 0,
+        ratingsGood: 0,
+        ratingsEasy: 0,
         sessionSummary: null,
       });
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to load study queue:', error);
-      set({ error: error.message || 'Failed to load study queue' });
+      const message =
+        error instanceof Error ? error.message : 'Failed to load study queue';
+      set({ error: message });
     } finally {
       set({ loading: false });
     }
@@ -95,7 +114,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
   },
 
   submitReview: async (rating) => {
-    const { queue, currentIndex, sessionStartTime } = get();
+    const { queue, currentIndex, cardStartTime } = get();
     const currentCard = queue[currentIndex];
 
     if (!currentCard) {
@@ -105,9 +124,9 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     try {
       set({ submitting: true, error: null });
 
-      // Calculate time spent (rough estimate)
-      const timeSpent = sessionStartTime
-        ? Math.floor((Date.now() - sessionStartTime) / 1000)
+      // Calculate time spent on this card
+      const timeSpent = cardStartTime
+        ? Math.floor((Date.now() - cardStartTime) / 1000)
         : undefined;
 
       const response = await studyService.submitReview({
@@ -116,14 +135,36 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         time_spent_seconds: timeSpent,
       });
 
-      set((state) => ({
-        cardsStudied: state.cardsStudied + 1,
-      }));
+      // Track rating breakdown
+      set((state) => {
+        const updates: Partial<StudyState> = {
+          cardsStudied: state.cardsStudied + 1,
+        };
+
+        switch (rating) {
+          case 1:
+            updates.ratingsAgain = state.ratingsAgain + 1;
+            break;
+          case 2:
+            updates.ratingsHard = state.ratingsHard + 1;
+            break;
+          case 3:
+            updates.ratingsGood = state.ratingsGood + 1;
+            break;
+          case 4:
+            updates.ratingsEasy = state.ratingsEasy + 1;
+            break;
+        }
+
+        return updates;
+      });
 
       return response;
-    } catch (error: any) {
+    } catch (error) {
       console.error('Failed to submit review:', error);
-      set({ error: error.message || 'Failed to submit review' });
+      const message =
+        error instanceof Error ? error.message : 'Failed to submit review';
+      set({ error: message });
       throw error;
     } finally {
       set({ submitting: false });
@@ -136,7 +177,7 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       return {
         currentIndex: newIndex,
         isFlipped: false,
-        sessionStartTime: Date.now(), // Reset timer for next card
+        cardStartTime: Date.now(), // Reset timer for next card
       };
     });
   },
@@ -162,6 +203,11 @@ export const useStudyStore = create<StudyState>((set, get) => ({
       overdueCards: 0,
       cardsStudied: 0,
       sessionStartTime: null,
+      cardStartTime: null,
+      ratingsAgain: 0,
+      ratingsHard: 0,
+      ratingsGood: 0,
+      ratingsEasy: 0,
       sessionSummary: null,
     });
   },
