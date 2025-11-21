@@ -45,3 +45,8 @@ export type { ProgressVariant, ProgressSize } from './Progress';
 
 export { Switch } from './Switch';
 export type { SwitchSize } from './Switch';
+
+// Study components
+export { StudyFlashcard } from './StudyFlashcard';
+export { RatingButtons } from './RatingButtons';
+export { StudySessionSummary } from './StudySessionSummary';
