@@ -25,6 +25,9 @@ export const materialsService = {
    * Upload a PDF file or paste text to create a study material
    */
   async uploadMaterial(request: UploadMaterialRequest): Promise<UploadMaterialResponse> {
+    console.log('[MaterialsService] Starting upload:', request.filename);
+    const startTime = Date.now();
+
     const formData = new FormData();
 
     if (request.file) {
@@ -56,8 +59,12 @@ export const materialsService = {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
+        timeout: 60000, // 1 minute timeout for PDF upload
       }
     );
+
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    console.log(`[MaterialsService] Upload completed in ${elapsed}s`);
 
     return response.data;
   },

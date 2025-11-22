@@ -83,7 +83,7 @@ async def create_flashcard(
         user_stats.cards_new += 1
         db.commit()
 
-    return FlashcardResponse.from_orm(flashcard)
+    return FlashcardResponse.model_validate(flashcard)
 
 
 @router.get("", response_model=FlashcardListResponse)
@@ -132,7 +132,7 @@ async def list_flashcards(
     flashcards = query.order_by(Flashcard.created_at.desc()).offset(offset).limit(page_size).all()
 
     return FlashcardListResponse(
-        flashcards=[FlashcardResponse.from_orm(f) for f in flashcards],
+        flashcards=[FlashcardResponse.model_validate(f) for f in flashcards],
         total=total,
         page=page,
         page_size=page_size
@@ -162,7 +162,7 @@ async def get_flashcard(
             detail="Flashcard not found"
         )
 
-    return FlashcardResponse.from_orm(flashcard)
+    return FlashcardResponse.model_validate(flashcard)
 
 
 @router.put("/{flashcard_id}", response_model=FlashcardResponse)
@@ -228,7 +228,7 @@ async def update_flashcard(
     db.commit()
     db.refresh(flashcard)
 
-    return FlashcardResponse.from_orm(flashcard)
+    return FlashcardResponse.model_validate(flashcard)
 
 
 @router.delete("/{flashcard_id}", status_code=status.HTTP_204_NO_CONTENT)
@@ -279,9 +279,11 @@ async def generate_flashcards(
 
     Requires authentication and ownership of the material.
     """
+    print(f"🎯 [GENERATE] Starting generation for material {request.material_id}")
     user_uuid = uuid.UUID(user_id)
 
     # Get the material
+    print(f"📚 [GENERATE] Fetching material from database...")
     material = db.query(StudyMaterial).filter(
         StudyMaterial.id == request.material_id,
         StudyMaterial.user_id == user_uuid,
@@ -289,13 +291,17 @@ async def generate_flashcards(
     ).first()
 
     if not material:
+        print(f"❌ [GENERATE] Material not found")
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Study material not found"
         )
 
+    print(f"✅ [GENERATE] Material found: {material.filename}, {len(material.extracted_text)} chars")
+
     # Validate material has text
     if not material.extracted_text or len(material.extracted_text.strip()) < 50:
+        print(f"❌ [GENERATE] Insufficient text")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Material does not contain sufficient text for generation"
@@ -307,6 +313,7 @@ async def generate_flashcards(
         difficulty_str = difficulty_map.get(request.difficulty) if request.difficulty else None
 
         # Generate flashcards using OpenAI
+        print(f"🤖 [GENERATE] Calling Claude API for {request.card_count} cards...")
         logger.info(
             f"Generating {request.card_count} flashcards for material {request.material_id}"
         )
@@ -319,10 +326,13 @@ async def generate_flashcards(
             ai_confidence=0.85  # Base confidence score
         )
 
+        print(f"✅ [GENERATE] Claude returned {len(generated_cards)} cards")
+
         # Create flashcards in database with "draft" status
+        print(f"💾 [GENERATE] Saving {len(generated_cards)} cards to database...")
         created_flashcards = []
 
-        for card_data in generated_cards:
+        for i, card_data in enumerate(generated_cards):
             flashcard = Flashcard(
                 user_id=user_uuid,
                 material_id=request.material_id,
@@ -349,13 +359,16 @@ async def generate_flashcards(
 
             created_flashcards.append(flashcard)
 
+        print(f"💾 [GENERATE] Committing to database...")
         db.commit()
 
         # Refresh all flashcards to get updated data
+        print(f"🔄 [GENERATE] Refreshing flashcards...")
         for flashcard in created_flashcards:
             db.refresh(flashcard)
 
         # Update user stats
+        print(f"📊 [GENERATE] Updating user stats...")
         from app.models.user_stats import UserStats
         user_stats = db.query(UserStats).filter(UserStats.user_id == user_uuid).first()
         if user_stats:
@@ -364,12 +377,16 @@ async def generate_flashcards(
 
         logger.info(f"Successfully created {len(created_flashcards)} draft flashcards")
 
-        return FlashcardGenerateResponse(
-            flashcards=[FlashcardResponse.from_attributes(f) for f in created_flashcards],
+        print(f"📦 [GENERATE] Building response...")
+        response = FlashcardGenerateResponse(
+            cards=[FlashcardResponse.model_validate(f) for f in created_flashcards],
             material_id=request.material_id,
-            total_generated=len(created_flashcards),
+            count=len(created_flashcards),
             status="success"
         )
+
+        print(f"✅ [GENERATE] Response ready, returning {len(response.cards)} cards")
+        return response
 
     except ValueError as e:
         logger.error(f"Validation error during generation: {e}")
@@ -399,9 +416,11 @@ async def confirm_flashcards(
 
     Requires authentication and ownership.
     """
+    print(f"🎯 [CONFIRM] Confirming {len(request.flashcard_ids)} flashcards for user {user_id}")
     confirmed_count = 0
 
     for flashcard_id in request.flashcard_ids:
+        print(f"📝 [CONFIRM] Processing flashcard {flashcard_id}")
         flashcard = db.query(Flashcard).filter(
             Flashcard.id == flashcard_id,
             Flashcard.user_id == uuid.UUID(user_id),
@@ -410,6 +429,7 @@ async def confirm_flashcards(
         ).first()
 
         if flashcard:
+            print(f"✅ [CONFIRM] Found draft flashcard {flashcard_id}, activating...")
             flashcard.status = "active"
 
             # Set due date for the card stats when confirming
@@ -418,6 +438,7 @@ async def confirm_flashcards(
             ).first()
 
             if card_stats and card_stats.due_date is None:
+                print(f"📅 [CONFIRM] Setting due_date to today for card {flashcard_id}")
                 card_stats.due_date = date.today()  # Available for study immediately
 
                 # Update user card counts
@@ -427,10 +448,14 @@ async def confirm_flashcards(
                 ).first()
                 if user_stats:
                     user_stats.cards_new += 1
+                    print(f"📊 [CONFIRM] Updated cards_new to {user_stats.cards_new}")
 
             confirmed_count += 1
+        else:
+            print(f"❌ [CONFIRM] Flashcard {flashcard_id} not found or not draft status")
 
     db.commit()
+    print(f"✅ [CONFIRM] Successfully confirmed {confirmed_count}/{len(request.flashcard_ids)} flashcards")
 
     return {
         "message": f"Confirmed {confirmed_count} flashcards",

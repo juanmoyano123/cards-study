@@ -156,7 +156,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       set({ loading: true });
 
-      const response = await api.put('/users/me', data);
+      const response = await api.put('/auth/me', data);
       const updatedUser = response.data;
 
       // Update stored user

@@ -149,6 +149,8 @@ export default function UploadScreen() {
         filename: filename.trim(),
       });
 
+      console.log('[Upload] Upload response:', uploadResponse);
+      console.log('[Upload] Material ID:', uploadResponse.id);
       setMaterialId(uploadResponse.id);
 
       // Step 2: Extract text (already done by backend)
@@ -165,10 +167,17 @@ export default function UploadScreen() {
       setProgress(0.6);
       setProgressMessage(`Generating ${cardCount} flashcards with AI...`);
 
+      console.log('[Upload] About to call generateFlashcards with:', {
+        material_id: uploadResponse.id,
+        card_count: parseInt(cardCount),
+      });
+
       const generateResponse = await flashcardsService.generateFlashcards({
         material_id: uploadResponse.id,
         card_count: parseInt(cardCount),
       });
+
+      console.log('[Upload] Generate response received:', generateResponse);
 
       setProgress(1);
       setProgressMessage('Generation complete!');
@@ -440,7 +449,7 @@ export default function UploadScreen() {
         <Text variant="h3" align="center" style={styles.progressTitle}>
           {progressMessage}
         </Text>
-        <ProgressBar value={progress * 100} style={styles.progressBar} animated />
+        <ProgressBar value={Math.round(progress * 100)} style={styles.progressBar} animated />
         <Text variant="caption" color="secondary" align="center">
           This may take 30-60 seconds...
         </Text>

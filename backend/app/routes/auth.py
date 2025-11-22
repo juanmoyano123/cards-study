@@ -111,7 +111,7 @@ async def get_me(
 
     Requires authentication.
     """
-    return UserResponse.from_orm(current_user)
+    return UserResponse.model_validate(current_user)
 
 
 @router.put("/me", response_model=UserResponse)
@@ -155,7 +155,7 @@ async def update_me(
     db.commit()
     db.refresh(current_user)
 
-    return UserResponse.from_orm(current_user)
+    return UserResponse.model_validate(current_user)
 
 
 @router.post("/logout")

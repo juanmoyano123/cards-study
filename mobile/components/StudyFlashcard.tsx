@@ -95,14 +95,16 @@ export function StudyFlashcard({ card, isFlipped, onFlip }: StudyFlashcardProps)
         ]}
       >
         <View style={styles.header}>
-          <Badge
-            variant="outline"
-            style={{ borderColor: getMasteryColor(card.mastery_level) }}
+          <View
+            style={[
+              styles.masteryBadge,
+              { borderColor: getMasteryColor(card.mastery_level) }
+            ]}
           >
-            <Text style={{ color: getMasteryColor(card.mastery_level), fontSize: 12 }}>
+            <Text style={[styles.masteryText, { color: getMasteryColor(card.mastery_level) }]}>
               {card.mastery_level.charAt(0).toUpperCase() + card.mastery_level.slice(1)}
             </Text>
-          </Badge>
+          </View>
           {card.review_count > 0 && (
             <Text style={styles.reviewCount}>
               Reviews: {card.review_count}
@@ -132,14 +134,16 @@ export function StudyFlashcard({ card, isFlipped, onFlip }: StudyFlashcardProps)
         ]}
       >
         <View style={styles.header}>
-          <Badge
-            variant="outline"
-            style={{ borderColor: getMasteryColor(card.mastery_level) }}
+          <View
+            style={[
+              styles.masteryBadge,
+              { borderColor: getMasteryColor(card.mastery_level) }
+            ]}
           >
-            <Text style={{ color: getMasteryColor(card.mastery_level), fontSize: 12 }}>
+            <Text style={[styles.masteryText, { color: getMasteryColor(card.mastery_level) }]}>
               {card.mastery_level.charAt(0).toUpperCase() + card.mastery_level.slice(1)}
             </Text>
-          </Badge>
+          </View>
         </View>
 
         <View style={styles.content}>
@@ -198,6 +202,17 @@ const styles = StyleSheet.create({
   reviewCount: {
     fontSize: 12,
     color: colors.neutral[500],
+  },
+  masteryBadge: {
+    paddingHorizontal: spacing[3],
+    paddingVertical: spacing[1],
+    borderRadius: 12,
+    borderWidth: 1,
+    backgroundColor: 'transparent',
+  },
+  masteryText: {
+    fontSize: 12,
+    fontWeight: '500',
   },
   content: {
     flex: 1,

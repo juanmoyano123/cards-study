@@ -32,11 +32,11 @@ class Settings(BaseSettings):
     SUPABASE_KEY: str = ""
     SUPABASE_JWT_SECRET: str = ""
 
-    # OpenAI
-    OPENAI_API_KEY: str = ""
-    OPENAI_MODEL: str = "gpt-4o-mini"
-    OPENAI_MAX_TOKENS: int = 4000
-    OPENAI_TEMPERATURE: float = 0.7
+    # Anthropic Claude
+    ANTHROPIC_API_KEY: str = ""
+    ANTHROPIC_MODEL: str = "claude-sonnet-4-20250514"
+    ANTHROPIC_MAX_TOKENS: int = 4000
+    ANTHROPIC_TEMPERATURE: float = 0.7
 
     # Security
     SECRET_KEY: str = "your-secret-key-change-in-production"
@@ -47,6 +47,8 @@ class Settings(BaseSettings):
     CORS_ORIGINS: list[str] = [
         "http://localhost:8081",  # Expo dev server
         "http://localhost:19006",  # Expo web
+        "http://172.20.13.209:8081",  # Local network access
+        "exp://172.20.13.209:8081",  # Expo Go
     ]
     CORS_ALLOW_CREDENTIALS: bool = True
     CORS_ALLOW_METHODS: list[str] = ["*"]

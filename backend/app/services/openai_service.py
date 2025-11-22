@@ -1,13 +1,13 @@
 """
-OpenAI Service for AI-powered flashcard generation.
+Anthropic Claude Service for AI-powered flashcard generation.
 
-Uses GPT-4o-mini for cost-efficient flashcard generation from study materials.
+Uses Claude Sonnet for high-quality flashcard generation from study materials.
 """
 
 import os
 import json
 from typing import List, Dict, Optional
-from openai import AsyncOpenAI
+from anthropic import AsyncAnthropic
 from app.config import settings
 import logging
 
@@ -16,27 +16,29 @@ logger = logging.getLogger(__name__)
 
 class OpenAIService:
     """
-    Service for generating flashcards using OpenAI's GPT models.
+    Service for generating flashcards using Anthropic's Claude models.
+
+    Note: Class name kept as OpenAIService for backward compatibility.
 
     Features:
-    - Cost-efficient generation using gpt-4o-mini
-    - Few-shot prompting for high-quality cards
+    - High-quality generation using Claude Sonnet
+    - Few-shot prompting for excellent cards
     - Structured JSON output format
     - Error handling and retry logic
     """
 
     def __init__(self):
-        """Initialize the OpenAI client."""
-        api_key = os.getenv("OPENAI_API_KEY") or getattr(settings, "OPENAI_API_KEY", None)
+        """Initialize the Anthropic client."""
+        api_key = os.getenv("ANTHROPIC_API_KEY") or getattr(settings, "ANTHROPIC_API_KEY", None)
 
         if not api_key:
-            logger.warning("OPENAI_API_KEY not found in environment variables")
+            logger.warning("ANTHROPIC_API_KEY not found in environment variables")
             self.client = None
         else:
-            self.client = AsyncOpenAI(api_key=api_key)
+            self.client = AsyncAnthropic(api_key=api_key)
 
         # Model configuration
-        self.model = "gpt-4o-mini"
+        self.model = "claude-sonnet-4-20250514"
         self.max_tokens = 4000
         self.temperature = 0.7
 
@@ -70,60 +72,43 @@ class OpenAIService:
 
         subject_guidance = f"Subject: {subject}\n" if subject else ""
 
-        prompt = f"""You are an expert educational content creator specializing in creating high-quality flashcards for spaced repetition learning.
+        prompt = f"""Eres un creador de flashcards educativas simples y efectivas para estudio con repetición espaciada.
 
-Your task is to analyze the provided text and generate {count} flashcards that will help students master the material.
+Tu tarea: crear {count} flashcards SIMPLES del siguiente texto.
 
 {subject_guidance}{difficulty_guidance}
 
-GUIDELINES:
-1. Each flashcard should focus on ONE specific concept, fact, or relationship
-2. Questions should be clear, specific, and unambiguous
-3. Answers should be concise but complete (2-4 sentences ideal)
-4. Use active recall principles - make students retrieve information
-5. Include context clues in questions when needed
-6. Vary question types: definitions, explanations, applications, comparisons
-7. Assign difficulty: 1 (very easy) to 5 (very hard)
-8. Suggest relevant tags for categorization
+REGLAS IMPORTANTES:
+1. Preguntas CORTAS y DIRECTAS (máximo 15 palabras)
+2. Respuestas BREVES (1-2 oraciones, máximo 30 palabras)
+3. Enfócate en un solo concepto por tarjeta
+4. Usa lenguaje simple y claro
+5. Dificultad: 1 (muy fácil) a 5 (muy difícil)
 
-FEW-SHOT EXAMPLES:
+EJEMPLOS:
 
-Example 1 (Definition):
 {{
-  "question": "What is photosynthesis?",
-  "answer": "Photosynthesis is the process by which plants use sunlight, water, and carbon dioxide to produce oxygen and energy in the form of glucose.",
-  "explanation": "This is a fundamental biological process that occurs in chloroplasts.",
+  "question": "¿Qué es la fotosíntesis?",
+  "answer": "Proceso donde las plantas usan luz solar para crear energía y oxígeno.",
   "difficulty": 2,
-  "tags": ["biology", "plants", "energy"]
+  "tags": ["biología", "plantas"]
 }}
 
-Example 2 (Application):
 {{
-  "question": "How does the SOLID principle of Single Responsibility apply to class design in software engineering?",
-  "answer": "The Single Responsibility Principle states that a class should have only one reason to change, meaning it should have only one job or responsibility. This makes code more maintainable and easier to test.",
-  "explanation": "This principle helps reduce coupling and increase cohesion in codebases.",
-  "difficulty": 4,
-  "tags": ["software engineering", "SOLID", "design patterns"]
-}}
-
-Example 3 (Comparison):
-{{
-  "question": "What is the key difference between mitosis and meiosis?",
-  "answer": "Mitosis produces two identical diploid cells for growth and repair, while meiosis produces four non-identical haploid cells (gametes) for sexual reproduction.",
-  "explanation": "Both are types of cell division but serve different purposes in organisms.",
+  "question": "¿Cuál es la diferencia entre mitosis y meiosis?",
+  "answer": "Mitosis crea 2 células idénticas, meiosis crea 4 células diferentes.",
   "difficulty": 3,
-  "tags": ["biology", "cell division", "genetics"]
+  "tags": ["biología", "células"]
 }}
 
-SOURCE TEXT:
+TEXTO:
 {text}
 
-Generate exactly {count} flashcards following the format above. Return ONLY a valid JSON array with no additional text:
+Genera EXACTAMENTE {count} flashcards. Retorna SOLO el array JSON:
 [
   {{
     "question": "...",
     "answer": "...",
-    "explanation": "..." (optional),
     "difficulty": 1-5,
     "tags": ["tag1", "tag2"]
   }}
@@ -140,7 +125,7 @@ Generate exactly {count} flashcards following the format above. Return ONLY a va
         ai_confidence: Optional[float] = None
     ) -> List[Dict]:
         """
-        Generate flashcards from text using OpenAI.
+        Generate flashcards from text using Anthropic Claude.
 
         Args:
             text: Source text to generate flashcards from
@@ -164,7 +149,7 @@ Generate exactly {count} flashcards following the format above. Return ONLY a va
         """
         if not self.client:
             raise ValueError(
-                "OpenAI API key not configured. Please set OPENAI_API_KEY environment variable."
+                "Anthropic API key not configured. Please set ANTHROPIC_API_KEY environment variable."
             )
 
         # Validate inputs
@@ -180,29 +165,24 @@ Generate exactly {count} flashcards following the format above. Return ONLY a va
         try:
             logger.info(f"Generating {count} flashcards using {self.model}")
 
-            # Call OpenAI API
-            response = await self.client.chat.completions.create(
+            # Call Anthropic API
+            response = await self.client.messages.create(
                 model=self.model,
+                max_tokens=self.max_tokens,
+                temperature=self.temperature,
                 messages=[
-                    {
-                        "role": "system",
-                        "content": "You are an expert educational content creator. You generate high-quality flashcards in JSON format."
-                    },
                     {
                         "role": "user",
                         "content": prompt
                     }
-                ],
-                temperature=self.temperature,
-                max_tokens=self.max_tokens,
-                response_format={"type": "json_object"} if self.model != "gpt-4o-mini" else None
+                ]
             )
 
             # Extract content
-            content = response.choices[0].message.content
+            content = response.content[0].text
 
             if not content:
-                raise Exception("Empty response from OpenAI API")
+                raise Exception("Empty response from Anthropic API")
 
             # Parse JSON
             # Try to find JSON array in the response
@@ -258,7 +238,7 @@ Generate exactly {count} flashcards following the format above. Return ONLY a va
                 normalized_card = {
                     'question': str(card['question']).strip(),
                     'answer': str(card['answer']).strip(),
-                    'explanation': str(card.get('explanation', '')).strip() or None,
+                    'explanation': str(card.get('explanation', '')).strip() if card.get('explanation') else None,
                     'difficulty': min(5, max(1, int(card.get('difficulty', 3)))),
                     'tags': card.get('tags', []) if isinstance(card.get('tags'), list) else [],
                 }

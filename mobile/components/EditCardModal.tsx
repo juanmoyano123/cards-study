@@ -313,8 +313,10 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   helperCard: {
-    backgroundColor: colors.blue[50],
-    borderColor: colors.blue[200],
+    backgroundColor: colors.info[50],
+    borderColor: colors.info[500],
+    borderWidth: 1,
+    borderRadius: 8,
     padding: spacing[3],
   },
   helperTip: {

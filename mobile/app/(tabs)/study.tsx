@@ -211,7 +211,7 @@ export default function StudyScreen() {
       {/* Progress bar */}
       <View style={styles.progressContainer}>
         <ProgressBar
-          value={totalDue > 0 ? (cardsStudied / totalDue) * 100 : 0}
+          value={totalDue > 0 ? Math.round((cardsStudied / totalDue) * 100) : 0}
           variant="primary"
           size="sm"
         />

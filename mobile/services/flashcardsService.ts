@@ -28,16 +28,22 @@ export const flashcardsService = {
   async generateFlashcards(
     request: GenerateFlashcardsRequest
   ): Promise<GenerateFlashcardsResponse> {
-    const response = await api.post<ApiResponse<GenerateFlashcardsResponse>>(
+    console.log('[FlashcardsService] Starting generation:', request);
+    const startTime = Date.now();
+
+    const response = await api.post<GenerateFlashcardsResponse>(
       '/flashcards/generate',
-      request
+      request,
+      {
+        timeout: 90000, // 90 seconds - should be enough for most PDFs
+      }
     );
 
-    if (response.data.error) {
-      throw new Error(response.data.error);
-    }
+    const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+    console.log(`[FlashcardsService] Generation completed in ${elapsed}s`);
+    console.log('[FlashcardsService] Response:', response.data);
 
-    return response.data.data!;
+    return response.data;
   },
 
   /**

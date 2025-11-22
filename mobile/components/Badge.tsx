@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, ViewStyle } from 'react-native';
 import { colors, spacing, borderRadius, fontSize } from '../constants';
 
-export type BadgeVariant = 'default' | 'primary' | 'success' | 'warning' | 'error' | 'info';
+export type BadgeVariant = 'default' | 'primary' | 'success' | 'warning' | 'error' | 'info' | 'neutral';
 export type BadgeSize = 'sm' | 'md' | 'lg';
 
 interface BadgeProps {
@@ -27,6 +27,11 @@ export const Badge: React.FC<BadgeProps> = ({
   const getColors = () => {
     const colorMap = {
       default: {
+        bg: colors.neutral[100],
+        text: colors.neutral[700],
+        border: colors.neutral[300],
+      },
+      neutral: {
         bg: colors.neutral[100],
         text: colors.neutral[700],
         border: colors.neutral[300],

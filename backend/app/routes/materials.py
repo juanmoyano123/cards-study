@@ -67,7 +67,7 @@ async def create_material(
         user_stats.total_materials_uploaded += 1
         db.commit()
 
-    return MaterialResponse.from_orm(material)
+    return MaterialResponse.model_validate(material)
 
 
 @router.post("/upload", response_model=MaterialResponse, status_code=status.HTTP_201_CREATED)
@@ -207,7 +207,7 @@ async def upload_material(
 
         logger.info(f"Successfully created material {material.id} with {word_count} words")
 
-        return MaterialResponse.from_orm(material)
+        return MaterialResponse.model_validate(material)
 
     except HTTPException:
         raise
@@ -255,7 +255,7 @@ async def list_materials(
     materials = query.order_by(StudyMaterial.created_at.desc()).offset(offset).limit(page_size).all()
 
     return MaterialListResponse(
-        materials=[MaterialResponse.from_orm(m) for m in materials],
+        materials=[MaterialResponse.model_validate(m) for m in materials],
         total=total,
         page=page,
         page_size=page_size
@@ -285,7 +285,7 @@ async def get_material(
             detail="Material not found"
         )
 
-    return MaterialResponse.from_orm(material)
+    return MaterialResponse.model_validate(material)
 
 
 @router.put("/{material_id}", response_model=MaterialResponse)
@@ -329,7 +329,7 @@ async def update_material(
     db.commit()
     db.refresh(material)
 
-    return MaterialResponse.from_orm(material)
+    return MaterialResponse.model_validate(material)
 
 
 @router.delete("/{material_id}", status_code=status.HTTP_204_NO_CONTENT)

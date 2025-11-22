@@ -52,11 +52,11 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     return colorMap[variant];
   };
 
-  const height = {
+  const height = Math.round({
     sm: 4,
     md: 8,
     lg: 12,
-  }[size];
+  }[size] || 8);
 
   const width = animatedWidth.interpolate({
     inputRange: [0, 100],
@@ -74,7 +74,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         </View>
       )}
       <View
-        style={[styles.track, { height, borderRadius: height / 2 }]}
+        style={[styles.track, { height, borderRadius: Math.round(height / 2) }]}
         accessibilityRole="progressbar"
         accessibilityLabel={accessibilityLabel || label || 'Progress'}
         accessibilityValue={{ min: 0, max: 100, now: clampedValue }}
@@ -86,7 +86,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
               width,
               height,
               backgroundColor: getColor(),
-              borderRadius: height / 2,
+              borderRadius: Math.round(height / 2),
             },
           ]}
         />
@@ -118,7 +118,7 @@ export const ProgressCircle: React.FC<ProgressCircleProps> = ({
   accessibilityLabel,
 }) => {
   const clampedValue = Math.min(Math.max(value, 0), 100);
-  const radius = (size - strokeWidth) / 2;
+  const radius = Math.round((size - strokeWidth) / 2);
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference - (clampedValue / 100) * circumference;
 
@@ -147,7 +147,7 @@ export const ProgressCircle: React.FC<ProgressCircleProps> = ({
           {
             width: size,
             height: size,
-            borderRadius: size / 2,
+            borderRadius: Math.round(size / 2),
             borderWidth: strokeWidth,
           },
         ]}
@@ -161,7 +161,7 @@ export const ProgressCircle: React.FC<ProgressCircleProps> = ({
             {
               width: size,
               height: size,
-              borderRadius: size / 2,
+              borderRadius: Math.round(size / 2),
               borderWidth: strokeWidth,
               borderColor: getColor(),
               borderTopColor: 'transparent',

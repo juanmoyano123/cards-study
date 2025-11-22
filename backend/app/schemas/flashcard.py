@@ -78,10 +78,10 @@ class FlashcardGenerateRequest(BaseModel):
 
 class FlashcardGenerateResponse(BaseModel):
     """Response schema for flashcard generation."""
-    flashcards: List[FlashcardResponse]
+    cards: List[FlashcardResponse]  # Changed from flashcards to match frontend
     material_id: uuid.UUID
-    total_generated: int
-    status: str  # "success", "partial", "failed"
+    count: int  # Changed from total_generated to match frontend
+    status: str = "success"  # "success", "partial", "failed"
 
 
 class FlashcardConfirmRequest(BaseModel):
