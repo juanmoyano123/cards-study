@@ -130,4 +130,23 @@ export const flashcardsService = {
 
     return response.data;
   },
+
+  /**
+   * Delete multiple flashcards
+   */
+  async deleteFlashcards(flashcardIds: string[]): Promise<{ deleted_count: number }> {
+    let deletedCount = 0;
+
+    // Delete each flashcard individually
+    for (const id of flashcardIds) {
+      try {
+        await api.delete(`/flashcards/${id}`);
+        deletedCount++;
+      } catch (error) {
+        console.error(`Failed to delete flashcard ${id}:`, error);
+      }
+    }
+
+    return { deleted_count: deletedCount };
+  },
 };

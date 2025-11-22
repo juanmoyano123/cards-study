@@ -343,17 +343,17 @@ async def generate_flashcards(
                 difficulty=card_data.get('difficulty', 3),
                 ai_confidence=card_data.get('ai_confidence', 0.85),
                 is_edited=False,
-                status="draft"  # AI-generated cards start as draft
+                status="active"  # AI-generated cards are immediately active
             )
 
             db.add(flashcard)
             db.flush()  # Get the ID
 
-            # Create card stats (but not due yet since it's draft)
+            # Create card stats with due_date set to today (available for study immediately)
             card_stats = CardStats(
                 card_id=flashcard.id,
                 user_id=user_uuid,
-                due_date=None  # Will be set when confirmed
+                due_date=date.today()  # Cards available for study immediately
             )
             db.add(card_stats)
 
