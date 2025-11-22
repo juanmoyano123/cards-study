@@ -269,24 +269,27 @@ export default function UploadScreen() {
     );
   };
 
-  // Handle save and navigate
+  // Finalize card selection by deleting unselected cards
   const handleSaveCards = async () => {
     try {
       const selectedCards = generatedCards.filter((c) => c.selected);
+      const unselectedCards = generatedCards.filter((c) => !c.selected);
 
       if (selectedCards.length === 0) {
-        Alert.alert('No Cards Selected', 'Please select at least one card to save');
+        Alert.alert('No Cards Selected', 'Please select at least one card to keep');
         return;
       }
 
-      // Confirm the selected cards
-      const cardIds = selectedCards.map((c) => c.id);
-      await flashcardsService.confirmFlashcards(cardIds);
+      // Delete the unselected cards (selected cards are already active and ready to study)
+      if (unselectedCards.length > 0) {
+        const unselectedIds = unselectedCards.map((c) => c.id);
+        await flashcardsService.deleteFlashcards(unselectedIds);
+      }
 
       // Show success toast
       Alert.alert(
         'Success!',
-        `${selectedCards.length} flashcards saved and ready to study`,
+        `${selectedCards.length} flashcard${selectedCards.length > 1 ? 's' : ''} ready to study`,
         [
           {
             text: 'Start Studying',
@@ -303,7 +306,7 @@ export default function UploadScreen() {
       resetForm();
     } catch (err: any) {
       console.error('Error saving cards:', err);
-      Alert.alert('Error', 'Failed to save flashcards. Please try again.');
+      Alert.alert('Error', 'Failed to finalize flashcards. Please try again.');
     }
   };
 
@@ -487,7 +490,7 @@ export default function UploadScreen() {
           style={styles.previewButton}
         />
         <Button
-          title={`Save ${generatedCards.filter((c) => c.selected).length} Cards`}
+          title={`Keep ${generatedCards.filter((c) => c.selected).length} Card${generatedCards.filter((c) => c.selected).length !== 1 ? 's' : ''}`}
           onPress={handleSaveCards}
           disabled={generatedCards.filter((c) => c.selected).length === 0}
           style={styles.previewButton}
