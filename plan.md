@@ -646,7 +646,17 @@ Then account is created
   And I'm redirected to onboarding
 ```
 
-**Scenario 2: Google OAuth signup**
+**Scenario 2: Sign in with Apple** (🔴 REQUIRED for iOS App Store)
+```gherkin
+Given I click "Continue with Apple"
+When I authorize with Apple
+Then account is created with Apple credentials
+  And email is hidden or real depending on user choice
+  And no email verification needed
+  And I'm redirected to onboarding
+```
+
+**Scenario 3: Google OAuth signup**
 ```gherkin
 Given I click "Sign up with Google"
 When I authorize with Google
@@ -655,7 +665,7 @@ Then account is created with Google profile data
   And I'm redirected to onboarding
 ```
 
-**Scenario 3: Password reset**
+**Scenario 4: Password reset**
 ```gherkin
 Given I forgot my password
 When I request password reset with my email
@@ -674,22 +684,36 @@ Then I receive reset link within 2 minutes
 
 **Implementation:**
 - Supabase Auth handles all authentication
-- Social logins: Google (primary), GitHub (optional)
+- 🔴 **MANDATORY:** Sign in with Apple (required per Apple App Store guidelines if offering 3rd-party auth)
+- Social logins: Apple (mandatory), Google (recommended), Email/Password (backup)
 - Email verification required for email signups
 - Session management with Supabase client
 
+**Apple Sign In Requirements:**
+- Must be implemented before submitting to App Store if Google auth is present
+- Uses Expo Apple Authentication module
+- Backend validates Apple ID token
+- Privacy-preserving (users can hide email)
+
 **Definition of Done:**
-- [ ] Email and Google signup work
+- [ ] Email signup/login works
+- [ ] 🔴 Sign in with Apple implemented (MANDATORY)
+- [ ] Google OAuth signup works (triggers Apple requirement)
 - [ ] Password reset flow complete
 - [ ] Protected routes redirect to login
 - [ ] Sessions persist across browser refresh
 - [ ] Security headers implemented
+- [ ] Apple App Store compliance verified
 
-**Estimated Effort:** 2 days
+**Estimated Effort:** 3 days (updated from 2 days)
 
 **Breakdown:**
-- Day 1: Supabase setup + signup/login flows
-- Day 2: Password reset + protected routes + session management
+- Day 1: Supabase setup + email signup/login flows
+- Day 2: Sign in with Apple implementation (expo-apple-authentication + backend validation)
+- Day 3: Google OAuth + password reset + session management
+
+**Priority Note:**
+Apple Sign In MUST be implemented before Google Sign In. Per Apple App Store Review Guidelines 4.8, if your app offers any third-party authentication method, you must also offer Sign in with Apple as an equivalent option.
 
 ---
 
