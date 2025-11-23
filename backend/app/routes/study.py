@@ -136,22 +136,24 @@ async def get_study_queue(
             # Never reviewed - it's new
             new_cards.append((flashcard, stats))
         elif stats.due_date < today:
-            # Overdue
+            # Overdue - stats guaranteed to be non-None here
             overdue_cards.append((flashcard, stats))
         elif stats.due_date == today:
-            # Due today
+            # Due today - stats guaranteed to be non-None here
             due_today.append((flashcard, stats))
         # Future cards are not included
 
     # Sort overdue by days overdue (most overdue first)
+    # Note: All items in overdue_cards have non-None stats due to filtering above
     overdue_cards.sort(
-        key=lambda x: x[1].due_date if x[1] else today,
+        key=lambda x: x[1].due_date,
         reverse=False
     )
 
     # Sort due today by difficulty (hardest first)
+    # Note: All items in due_today have non-None stats due to filtering above
     due_today.sort(
-        key=lambda x: -(x[1].ease_factor if x[1] else 2.5)
+        key=lambda x: -x[1].ease_factor
     )
 
     # Build the queue

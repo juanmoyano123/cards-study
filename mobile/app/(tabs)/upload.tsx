@@ -271,22 +271,61 @@ export default function UploadScreen() {
 
   // Finalize card selection by deleting unselected cards
   const handleSaveCards = async () => {
-    try {
-      const selectedCards = generatedCards.filter((c) => c.selected);
-      const unselectedCards = generatedCards.filter((c) => !c.selected);
+    const selectedCards = generatedCards.filter((c) => c.selected);
+    const unselectedCards = generatedCards.filter((c) => !c.selected);
 
-      if (selectedCards.length === 0) {
-        Alert.alert('No Cards Selected', 'Please select at least one card to keep');
-        return;
-      }
+    if (selectedCards.length === 0) {
+      Alert.alert('No Cards Selected', 'Please select at least one card to keep');
+      return;
+    }
 
-      // Delete the unselected cards (selected cards are already active and ready to study)
-      if (unselectedCards.length > 0) {
-        const unselectedIds = unselectedCards.map((c) => c.id);
-        await flashcardsService.deleteFlashcards(unselectedIds);
-      }
+    // Show confirmation dialog if there are unselected cards to delete
+    if (unselectedCards.length > 0) {
+      Alert.alert(
+        'Confirm Card Selection',
+        `You have selected ${selectedCards.length} card${selectedCards.length > 1 ? 's' : ''} to keep.\n\n${unselectedCards.length} unselected card${unselectedCards.length > 1 ? 's' : ''} will be permanently deleted.\n\nAre you sure you want to continue?`,
+        [
+          {
+            text: 'Cancel',
+            style: 'cancel',
+          },
+          {
+            text: 'Confirm',
+            style: 'destructive',
+            onPress: async () => {
+              try {
+                // Delete the unselected cards
+                const unselectedIds = unselectedCards.map((c) => c.id);
+                await flashcardsService.deleteFlashcards(unselectedIds);
 
-      // Show success toast
+                // Show success toast
+                Alert.alert(
+                  'Success!',
+                  `${selectedCards.length} flashcard${selectedCards.length > 1 ? 's' : ''} ready to study`,
+                  [
+                    {
+                      text: 'Start Studying',
+                      onPress: () => router.push('/(tabs)/study'),
+                    },
+                    {
+                      text: 'View Dashboard',
+                      onPress: () => router.push('/(tabs)'),
+                    },
+                  ]
+                );
+
+                // Reset form
+                resetForm();
+              } catch (err: any) {
+                console.error('Error saving cards:', err);
+                Alert.alert('Error', 'Failed to finalize flashcards. Please try again.');
+              }
+            },
+          },
+        ]
+      );
+    } else {
+      // No cards to delete, just show success
       Alert.alert(
         'Success!',
         `${selectedCards.length} flashcard${selectedCards.length > 1 ? 's' : ''} ready to study`,
@@ -304,9 +343,6 @@ export default function UploadScreen() {
 
       // Reset form
       resetForm();
-    } catch (err: any) {
-      console.error('Error saving cards:', err);
-      Alert.alert('Error', 'Failed to finalize flashcards. Please try again.');
     }
   };
 

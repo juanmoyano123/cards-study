@@ -1,5 +1,6 @@
 import { api } from './api';
 import type { User, ApiResponse } from '../types';
+import { handleApiResponse } from '../utils/apiHelpers';
 
 export const authService = {
   /**
@@ -7,10 +8,7 @@ export const authService = {
    */
   async getMe(): Promise<User> {
     const response = await api.get<ApiResponse<User>>('/auth/me');
-    if (response.data.error) {
-      throw new Error(response.data.error);
-    }
-    return response.data.data!;
+    return handleApiResponse(response);
   },
 
   /**
@@ -18,9 +16,6 @@ export const authService = {
    */
   async updateProfile(data: Partial<User>): Promise<User> {
     const response = await api.put<ApiResponse<User>>('/auth/me', data);
-    if (response.data.error) {
-      throw new Error(response.data.error);
-    }
-    return response.data.data!;
+    return handleApiResponse(response);
   },
 };

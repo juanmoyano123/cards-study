@@ -190,9 +190,12 @@ def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
     if not user:
         return None
 
-    # Note: In production with Supabase Auth, password verification
-    # would be handled by Supabase. This is for development/testing.
-    # For now, we'll skip password verification since we're using Supabase Auth
+    # If using local auth (password_hash is set), verify password
+    # If using Supabase Auth (password_hash is None), skip verification
+    if user.password_hash:
+        if not verify_password(password, user.password_hash):
+            return None
+
     return user
 
 
@@ -224,8 +227,9 @@ def create_user(db: Session, email: str, password: str, name: str) -> User:
     user = User(
         email=email,
         name=name,
-        # Note: In production with Supabase Auth, password is managed by Supabase
-        # We don't store passwords in our database
+        # Hash password for local auth. In production with Supabase Auth,
+        # password_hash would be None and auth would be handled by Supabase
+        password_hash=hash_password(password) if password else None
     )
 
     db.add(user)

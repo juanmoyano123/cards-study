@@ -19,7 +19,7 @@ interface StudyFlashcardProps {
   onFlip: () => void;
 }
 
-export function StudyFlashcard({ card, isFlipped, onFlip }: StudyFlashcardProps) {
+export const StudyFlashcard = React.memo(function StudyFlashcard({ card, isFlipped, onFlip }: StudyFlashcardProps) {
   const flipAnimation = useRef(new Animated.Value(0)).current;
   const { width, height } = useWindowDimensions();
 
@@ -164,7 +164,7 @@ export function StudyFlashcard({ card, isFlipped, onFlip }: StudyFlashcardProps)
       </Animated.View>
     </Pressable>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: {

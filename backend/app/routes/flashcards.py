@@ -419,45 +419,53 @@ async def confirm_flashcards(
     print(f"🎯 [CONFIRM] Confirming {len(request.flashcard_ids)} flashcards for user {user_id}")
     confirmed_count = 0
 
-    for flashcard_id in request.flashcard_ids:
-        print(f"📝 [CONFIRM] Processing flashcard {flashcard_id}")
-        flashcard = db.query(Flashcard).filter(
-            Flashcard.id == flashcard_id,
-            Flashcard.user_id == uuid.UUID(user_id),
-            Flashcard.status == "draft",
-            Flashcard.deleted_at.is_(None)
-        ).first()
-
-        if flashcard:
-            print(f"✅ [CONFIRM] Found draft flashcard {flashcard_id}, activating...")
-            flashcard.status = "active"
-
-            # Set due date for the card stats when confirming
-            card_stats = db.query(CardStats).filter(
-                CardStats.card_id == flashcard_id
+    try:
+        for flashcard_id in request.flashcard_ids:
+            print(f"📝 [CONFIRM] Processing flashcard {flashcard_id}")
+            flashcard = db.query(Flashcard).filter(
+                Flashcard.id == flashcard_id,
+                Flashcard.user_id == uuid.UUID(user_id),
+                Flashcard.status == "draft",
+                Flashcard.deleted_at.is_(None)
             ).first()
 
-            if card_stats and card_stats.due_date is None:
-                print(f"📅 [CONFIRM] Setting due_date to today for card {flashcard_id}")
-                card_stats.due_date = date.today()  # Available for study immediately
+            if flashcard:
+                print(f"✅ [CONFIRM] Found draft flashcard {flashcard_id}, activating...")
+                flashcard.status = "active"
 
-                # Update user card counts
-                from app.models.user_stats import UserStats
-                user_stats = db.query(UserStats).filter(
-                    UserStats.user_id == uuid.UUID(user_id)
+                # Set due date for the card stats when confirming
+                card_stats = db.query(CardStats).filter(
+                    CardStats.card_id == flashcard_id
                 ).first()
-                if user_stats:
-                    user_stats.cards_new += 1
-                    print(f"📊 [CONFIRM] Updated cards_new to {user_stats.cards_new}")
 
-            confirmed_count += 1
-        else:
-            print(f"❌ [CONFIRM] Flashcard {flashcard_id} not found or not draft status")
+                if card_stats and card_stats.due_date is None:
+                    print(f"📅 [CONFIRM] Setting due_date to today for card {flashcard_id}")
+                    card_stats.due_date = date.today()  # Available for study immediately
 
-    db.commit()
-    print(f"✅ [CONFIRM] Successfully confirmed {confirmed_count}/{len(request.flashcard_ids)} flashcards")
+                    # Update user card counts
+                    from app.models.user_stats import UserStats
+                    user_stats = db.query(UserStats).filter(
+                        UserStats.user_id == uuid.UUID(user_id)
+                    ).first()
+                    if user_stats:
+                        user_stats.cards_new += 1
+                        print(f"📊 [CONFIRM] Updated cards_new to {user_stats.cards_new}")
 
-    return {
-        "message": f"Confirmed {confirmed_count} flashcards",
-        "confirmed_count": confirmed_count
-    }
+                confirmed_count += 1
+            else:
+                print(f"❌ [CONFIRM] Flashcard {flashcard_id} not found or not draft status")
+
+        db.commit()
+        print(f"✅ [CONFIRM] Successfully confirmed {confirmed_count}/{len(request.flashcard_ids)} flashcards")
+
+        return {
+            "message": f"Confirmed {confirmed_count} flashcards",
+            "confirmed_count": confirmed_count
+        }
+    except Exception as e:
+        db.rollback()
+        print(f"❌ [CONFIRM] Error confirming flashcards: {str(e)}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error confirming flashcards: {str(e)}"
+        )

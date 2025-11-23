@@ -25,6 +25,7 @@ class User(Base):
     email = Column(String(255), unique=True, nullable=False, index=True)
     name = Column(String(255), nullable=False)
     avatar_url = Column(String)
+    password_hash = Column(String, nullable=True)  # For local auth, None when using Supabase Auth
 
     # User preferences
     daily_card_limit = Column(Integer, default=100)

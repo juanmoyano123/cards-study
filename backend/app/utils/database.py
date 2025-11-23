@@ -2,7 +2,7 @@
 Database utilities and session management.
 """
 
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.pool import QueuePool
@@ -73,7 +73,7 @@ async def check_database() -> bool:
     """
     try:
         with get_db_context() as db:
-            db.execute("SELECT 1")
+            db.execute(text("SELECT 1"))
         return True
     except Exception as e:
         print(f"Database health check failed: {e}")

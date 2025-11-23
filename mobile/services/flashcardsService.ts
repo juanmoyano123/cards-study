@@ -1,5 +1,6 @@
 import { api } from './api';
 import type { Flashcard, ApiResponse, PaginatedResponse } from '../types';
+import { handleApiResponse } from '../utils/apiHelpers';
 
 export interface GenerateFlashcardsRequest {
   material_id: string;
@@ -68,10 +69,7 @@ export const flashcardsService = {
    */
   async getFlashcard(id: string): Promise<Flashcard> {
     const response = await api.get<ApiResponse<Flashcard>>(`/flashcards/${id}`);
-    if (response.data.error) {
-      throw new Error(response.data.error);
-    }
-    return response.data.data!;
+    return handleApiResponse(response);
   },
 
   /**
@@ -85,12 +83,7 @@ export const flashcardsService = {
       `/flashcards/${id}`,
       data
     );
-
-    if (response.data.error) {
-      throw new Error(response.data.error);
-    }
-
-    return response.data.data!;
+    return handleApiResponse(response);
   },
 
   /**
@@ -98,6 +91,7 @@ export const flashcardsService = {
    */
   async deleteFlashcard(id: string): Promise<void> {
     const response = await api.delete<ApiResponse<void>>(`/flashcards/${id}`);
+    // For void responses, we just need to check for errors
     if (response.data.error) {
       throw new Error(response.data.error);
     }
@@ -111,12 +105,7 @@ export const flashcardsService = {
       '/flashcards/batch',
       { cards }
     );
-
-    if (response.data.error) {
-      throw new Error(response.data.error);
-    }
-
-    return response.data.data!;
+    return handleApiResponse(response);
   },
 
   /**

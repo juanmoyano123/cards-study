@@ -30,7 +30,7 @@ interface CardPreviewProps {
   style?: ViewStyle;
 }
 
-export const CardPreview: React.FC<CardPreviewProps> = ({
+export const CardPreview = React.memo<CardPreviewProps>(({
   cards,
   onToggleSelect,
   onEdit,
@@ -201,7 +201,7 @@ export const CardPreview: React.FC<CardPreviewProps> = ({
       />
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   container: {
