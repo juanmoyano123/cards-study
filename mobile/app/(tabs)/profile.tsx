@@ -1,18 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, Alert, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
 import { ChevronRight, User, Bell, Settings } from 'lucide-react-native';
 import { Card, Text, Button, Toast } from '../../components';
 import { useAuthStore } from '../../stores/authStore';
+import { useDashboardStore } from '../../stores/dashboardStore';
 import { colors, spacing } from '../../constants';
 
 export default function ProfileScreen() {
   const { user, signOut, loading } = useAuthStore();
+  const { stats, loadDashboardStats } = useDashboardStore();
   const [toast, setToast] = useState<{
     visible: boolean;
     message: string;
     type: 'success' | 'error' | 'warning' | 'info';
   }>({ visible: false, message: '', type: 'info' });
+
+  useEffect(() => {
+    // Load stats if not already loaded
+    if (!stats) {
+      loadDashboardStats();
+    }
+  }, []);
 
   const handleSettingPress = (setting: string) => {
     // TODO: Navigate to setting screens when implemented
@@ -89,7 +98,7 @@ export default function ProfileScreen() {
             Total Cards
           </Text>
           <Text variant="bodyLarge" style={styles.statValue}>
-            0
+            {stats?.total_cards || 0}
           </Text>
         </View>
 
@@ -98,7 +107,7 @@ export default function ProfileScreen() {
             Cards Mastered
           </Text>
           <Text variant="bodyLarge" style={styles.statValue}>
-            0
+            {stats?.total_cards_mastered || 0}
           </Text>
         </View>
 
@@ -107,7 +116,16 @@ export default function ProfileScreen() {
             Current Streak
           </Text>
           <Text variant="bodyLarge" style={styles.statValue}>
-            0 days 🔥
+            {stats?.current_streak || 0} days 🔥
+          </Text>
+        </View>
+
+        <View style={styles.statRow}>
+          <Text variant="body" color="secondary">
+            Longest Streak
+          </Text>
+          <Text variant="bodyLarge" style={styles.statValue}>
+            {stats?.longest_streak || 0} days 🏆
           </Text>
         </View>
 
@@ -116,7 +134,7 @@ export default function ProfileScreen() {
             Total Study Time
           </Text>
           <Text variant="bodyLarge" style={styles.statValue}>
-            0 hours
+            {Math.round((stats?.total_study_time_minutes || 0) / 60)} hours
           </Text>
         </View>
       </Card>

@@ -56,3 +56,6 @@ export { CardPreview } from './CardPreview';
 export type { PreviewCard } from './CardPreview';
 export { EditCardModal } from './EditCardModal';
 export type { EditableCard } from './EditCardModal';
+
+// Dashboard components
+export { Heatmap } from './Heatmap';
