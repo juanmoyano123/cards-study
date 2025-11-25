@@ -447,6 +447,244 @@ async def end_study_session(
     )
 
 
+# ============ Pomodoro Schemas ============
+
+class PomodoroStats(BaseModel):
+    """Pomodoro statistics for a day."""
+    pomodoro_sessions: int
+    total_focus_minutes: int
+    date: str
+
+
+class PomodoroSessionResponse(BaseModel):
+    """Response after completing a Pomodoro."""
+    success: bool
+    pomodoro_count: int
+    message: Optional[str] = None
+
+
+class PomodoroSettingsRequest(BaseModel):
+    """Request to update Pomodoro settings."""
+    work_duration: Optional[int] = Field(None, ge=60, le=7200, description="Work duration in seconds")
+    break_duration: Optional[int] = Field(None, ge=60, le=1800, description="Break duration in seconds")
+    long_break_duration: Optional[int] = Field(None, ge=60, le=3600, description="Long break duration in seconds")
+    pomodoros_until_long_break: Optional[int] = Field(None, ge=2, le=10, description="Pomodoros until long break")
+    auto_start_break: Optional[bool] = None
+    auto_start_work: Optional[bool] = None
+    sound_enabled: Optional[bool] = None
+    vibration_enabled: Optional[bool] = None
+
+
+class PomodoroSettingsResponse(BaseModel):
+    """Pomodoro settings response."""
+    work_duration: int = 1500  # 25 minutes
+    break_duration: int = 300  # 5 minutes
+    long_break_duration: int = 900  # 15 minutes
+    pomodoros_until_long_break: int = 4
+    auto_start_break: bool = False
+    auto_start_work: bool = False
+    sound_enabled: bool = True
+    vibration_enabled: bool = True
+
+
+# ============ Pomodoro Endpoints ============
+
+@router.post("/pomodoro/complete", response_model=PomodoroSessionResponse)
+async def complete_pomodoro(
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Record a completed Pomodoro session.
+    Increments the pomodoro_sessions counter for today's study session.
+
+    Requires authentication.
+    """
+    user_uuid = uuid.UUID(user_id)
+    today = date.today()
+
+    # Get or create today's study session
+    session = db.query(StudySession).filter(
+        StudySession.user_id == user_uuid,
+        StudySession.date == today
+    ).first()
+
+    if not session:
+        session = StudySession(
+            user_id=user_uuid,
+            date=today,
+            start_time=datetime.utcnow()
+        )
+        db.add(session)
+        db.flush()
+
+    # Increment pomodoro count
+    session.pomodoro_sessions += 1
+    # Add 25 minutes of focus time (default Pomodoro duration)
+    session.time_spent_minutes += 25
+
+    db.commit()
+
+    return PomodoroSessionResponse(
+        success=True,
+        pomodoro_count=session.pomodoro_sessions,
+        message=f"Pomodoro #{session.pomodoro_sessions} completed!"
+    )
+
+
+@router.get("/pomodoro/today", response_model=PomodoroStats)
+async def get_today_pomodoro_stats(
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Get today's Pomodoro statistics.
+
+    Requires authentication.
+    """
+    user_uuid = uuid.UUID(user_id)
+    today = date.today()
+
+    session = db.query(StudySession).filter(
+        StudySession.user_id == user_uuid,
+        StudySession.date == today
+    ).first()
+
+    if not session:
+        return PomodoroStats(
+            pomodoro_sessions=0,
+            total_focus_minutes=0,
+            date=today.isoformat()
+        )
+
+    return PomodoroStats(
+        pomodoro_sessions=session.pomodoro_sessions,
+        total_focus_minutes=session.time_spent_minutes,
+        date=today.isoformat()
+    )
+
+
+@router.post("/pomodoro/start")
+async def start_pomodoro_session(
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Start a new Pomodoro session.
+    Creates or updates today's study session.
+
+    Requires authentication.
+    """
+    user_uuid = uuid.UUID(user_id)
+    today = date.today()
+
+    # Get or create today's study session
+    session = db.query(StudySession).filter(
+        StudySession.user_id == user_uuid,
+        StudySession.date == today
+    ).first()
+
+    if not session:
+        session = StudySession(
+            user_id=user_uuid,
+            date=today,
+            start_time=datetime.utcnow()
+        )
+        db.add(session)
+        db.commit()
+
+    return {
+        "session_id": str(session.id),
+        "started_at": session.start_time.isoformat() if session.start_time else None
+    }
+
+
+@router.get("/pomodoro/settings", response_model=PomodoroSettingsResponse)
+async def get_pomodoro_settings(
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Get user's Pomodoro settings.
+
+    Currently returns default settings. Future: store in user_settings table.
+
+    Requires authentication.
+    """
+    # TODO: Implement user-specific settings storage
+    # For now, return defaults
+    return PomodoroSettingsResponse()
+
+
+@router.patch("/pomodoro/settings", response_model=PomodoroSettingsResponse)
+async def update_pomodoro_settings(
+    settings: PomodoroSettingsRequest,
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Update user's Pomodoro settings.
+
+    Currently just returns the provided settings merged with defaults.
+    Future: store in user_settings table.
+
+    Requires authentication.
+    """
+    # TODO: Implement user-specific settings storage
+    # For now, return merged settings
+    defaults = PomodoroSettingsResponse()
+
+    return PomodoroSettingsResponse(
+        work_duration=settings.work_duration or defaults.work_duration,
+        break_duration=settings.break_duration or defaults.break_duration,
+        long_break_duration=settings.long_break_duration or defaults.long_break_duration,
+        pomodoros_until_long_break=settings.pomodoros_until_long_break or defaults.pomodoros_until_long_break,
+        auto_start_break=settings.auto_start_break if settings.auto_start_break is not None else defaults.auto_start_break,
+        auto_start_work=settings.auto_start_work if settings.auto_start_work is not None else defaults.auto_start_work,
+        sound_enabled=settings.sound_enabled if settings.sound_enabled is not None else defaults.sound_enabled,
+        vibration_enabled=settings.vibration_enabled if settings.vibration_enabled is not None else defaults.vibration_enabled,
+    )
+
+
+@router.get("/pomodoro/history", response_model=List[PomodoroStats])
+async def get_pomodoro_history(
+    start_date: str = Query(..., description="Start date (YYYY-MM-DD)"),
+    end_date: str = Query(..., description="End date (YYYY-MM-DD)"),
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Get Pomodoro history for a date range.
+
+    Requires authentication.
+    """
+    user_uuid = uuid.UUID(user_id)
+
+    try:
+        start = datetime.strptime(start_date, "%Y-%m-%d").date()
+        end = datetime.strptime(end_date, "%Y-%m-%d").date()
+    except ValueError:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid date format. Use YYYY-MM-DD"
+        )
+
+    sessions = db.query(StudySession).filter(
+        StudySession.user_id == user_uuid,
+        StudySession.date >= start,
+        StudySession.date <= end
+    ).order_by(StudySession.date.desc()).all()
+
+    return [
+        PomodoroStats(
+            pomodoro_sessions=session.pomodoro_sessions,
+            total_focus_minutes=session.time_spent_minutes,
+            date=session.date.isoformat()
+        )
+        for session in sessions
+    ]
+
+
 # ============ Helpers ============
 
 def _build_study_card(flashcard: Flashcard, stats: Optional[CardStats]) -> StudyCard:

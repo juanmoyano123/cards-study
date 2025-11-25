@@ -4,7 +4,7 @@ import { Text } from './Text';
 import { Button } from './Button';
 import { Card } from './Card';
 import { colors, spacing } from '../constants';
-import { Trophy, Target, Clock, TrendingUp } from 'lucide-react-native';
+import { Trophy, Target, Clock, TrendingUp, Timer } from 'lucide-react-native';
 
 interface StudySessionSummaryProps {
   cardsStudied: number;
@@ -13,6 +13,7 @@ interface StudySessionSummaryProps {
   cardsGood: number;
   cardsEasy: number;
   timeSpentMinutes: number;
+  pomodorosCompleted?: number;
   onContinue: () => void;
   onGoToDashboard: () => void;
 }
@@ -24,6 +25,7 @@ export function StudySessionSummary({
   cardsGood,
   cardsEasy,
   timeSpentMinutes,
+  pomodorosCompleted = 0,
   onContinue,
   onGoToDashboard,
 }: StudySessionSummaryProps) {
@@ -64,11 +66,19 @@ export function StudySessionSummary({
             <Text style={styles.statLabel}>Minutes</Text>
           </View>
 
-          <View style={styles.statItem}>
-            <TrendingUp size={20} color={colors.info[500]} />
-            <Text style={styles.statValue}>{cardsGood + cardsEasy}</Text>
-            <Text style={styles.statLabel}>Mastered</Text>
-          </View>
+          {pomodorosCompleted > 0 ? (
+            <View style={styles.statItem}>
+              <Timer size={20} color={colors.warning[500]} />
+              <Text style={styles.statValue}>{pomodorosCompleted}</Text>
+              <Text style={styles.statLabel}>Pomodoros</Text>
+            </View>
+          ) : (
+            <View style={styles.statItem}>
+              <TrendingUp size={20} color={colors.info[500]} />
+              <Text style={styles.statValue}>{cardsGood + cardsEasy}</Text>
+              <Text style={styles.statLabel}>Mastered</Text>
+            </View>
+          )}
         </View>
       </Card>
 

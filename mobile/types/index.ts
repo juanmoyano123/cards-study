@@ -195,4 +195,23 @@ export interface SessionSummary {
   cards_easy: number;
   time_spent_minutes: number;
   streak_day: number;
+  pomodoro_sessions?: number;
+}
+
+// Pomodoro types
+export interface PomodoroStats {
+  pomodoro_sessions: number;
+  total_focus_minutes: number;
+  date: string;
+}
+
+export interface PomodoroSettings {
+  work_duration: number;
+  break_duration: number;
+  long_break_duration: number;
+  pomodoros_until_long_break: number;
+  auto_start_break: boolean;
+  auto_start_work: boolean;
+  sound_enabled: boolean;
+  vibration_enabled: boolean;
 }
