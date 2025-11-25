@@ -59,3 +59,7 @@ export type { EditableCard } from './EditCardModal';
 
 // Dashboard components
 export { Heatmap } from './Heatmap';
+
+// Pomodoro components
+export { PomodoroTimer } from './PomodoroTimer';
+export { PomodoroSettingsModal } from './PomodoroSettingsModal';

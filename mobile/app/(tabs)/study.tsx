@@ -7,7 +7,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { router } from 'expo-router';
-import { BookOpen, ArrowLeft, X } from 'lucide-react-native';
+import { BookOpen, ArrowLeft, X, Timer } from 'lucide-react-native';
 import {
   Text,
   Button,
@@ -18,14 +18,25 @@ import {
   StudySessionSummary,
   ProgressBar,
   Card,
+  PomodoroTimer,
+  PomodoroSettingsModal,
 } from '../../components';
 import { colors, spacing } from '../../constants';
 import { useStudyStore } from '../../stores/studyStore';
+import { usePomodoroStore } from '../../stores/pomodoroStore';
 
 type ViewState = 'loading' | 'empty' | 'studying' | 'complete';
 
 export default function StudyScreen() {
   const [refreshing, setRefreshing] = useState(false);
+  const [showPomodoroSettings, setShowPomodoroSettings] = useState(false);
+  const [showPomodoroTimer, setShowPomodoroTimer] = useState(false);
+
+  // Pomodoro store
+  const {
+    completedPomodoros,
+    loadTodayPomodoros,
+  } = usePomodoroStore();
 
   const {
     queue,
@@ -51,9 +62,10 @@ export default function StudyScreen() {
     resetSession,
   } = useStudyStore();
 
-  // Load queue on mount
+  // Load queue and pomodoro data on mount
   useEffect(() => {
     loadQueue();
+    loadTodayPomodoros();
   }, []);
 
   // Determine current view state
@@ -166,6 +178,7 @@ export default function StudyScreen() {
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <StudySessionSummary
             {...stats}
+            pomodorosCompleted={completedPomodoros}
             onContinue={handleContinue}
             onGoToDashboard={handleGoToDashboard}
           />
@@ -195,16 +208,20 @@ export default function StudyScreen() {
         </View>
 
         <View style={styles.headerRight}>
-          {newCards > 0 && (
-            <View style={[styles.badge, styles.newBadge]}>
-              <Text style={styles.badgeText}>{newCards} new</Text>
-            </View>
-          )}
-          {overdueCards > 0 && (
-            <View style={[styles.badge, styles.overdueBadge]}>
-              <Text style={styles.badgeText}>{overdueCards} overdue</Text>
-            </View>
-          )}
+          {/* Pomodoro Timer Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onPress={() => setShowPomodoroTimer(!showPomodoroTimer)}
+            style={styles.timerButton}
+          >
+            <Timer size={20} color={showPomodoroTimer ? colors.primary[500] : colors.neutral[500]} />
+            {completedPomodoros > 0 && (
+              <View style={styles.pomodoroCountBadge}>
+                <Text style={styles.pomodoroCountText}>{completedPomodoros}</Text>
+              </View>
+            )}
+          </Button>
         </View>
       </View>
 
@@ -216,6 +233,18 @@ export default function StudyScreen() {
           size="sm"
         />
       </View>
+
+      {/* Pomodoro Timer (collapsible) */}
+      {showPomodoroTimer && (
+        <View style={styles.pomodoroContainer}>
+          <PomodoroTimer
+            onComplete={() => {
+              // Pomodoro completed - could show a toast or notification
+            }}
+            onOpenSettings={() => setShowPomodoroSettings(true)}
+          />
+        </View>
+      )}
 
       {/* Card */}
       <View style={styles.cardContainer}>
@@ -249,6 +278,12 @@ export default function StudyScreen() {
           </Card>
         </View>
       )}
+
+      {/* Pomodoro Settings Modal */}
+      <PomodoroSettingsModal
+        visible={showPomodoroSettings}
+        onClose={() => setShowPomodoroSettings(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -334,5 +369,29 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: colors.primary[700],
     fontWeight: '500',
+  },
+  timerButton: {
+    padding: spacing[2],
+    position: 'relative',
+  },
+  pomodoroCountBadge: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    backgroundColor: colors.primary[500],
+    width: 16,
+    height: 16,
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  pomodoroCountText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: colors.white,
+  },
+  pomodoroContainer: {
+    paddingHorizontal: spacing[4],
+    paddingVertical: spacing[2],
   },
 });
