@@ -12,7 +12,7 @@ from datetime import datetime
 from app.config import settings
 
 # Import routes
-from app.routes import auth, materials, flashcards, study
+from app.routes import auth, materials, flashcards, study, stats
 
 
 @asynccontextmanager
@@ -95,8 +95,7 @@ app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(materials.router, prefix="/materials", tags=["Materials"])
 app.include_router(flashcards.router, prefix="/flashcards", tags=["Flashcards"])
 app.include_router(study.router, prefix="/study", tags=["Study"])
-# Stats routes will be added in Phase 6
-# app.include_router(stats.router, prefix="/stats", tags=["Stats"])
+app.include_router(stats.router, prefix="/stats", tags=["Stats"])
 
 
 # Global exception handler
