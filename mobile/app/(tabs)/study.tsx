@@ -20,6 +20,7 @@ import {
   Card,
   PomodoroTimer,
   PomodoroSettingsModal,
+  Toast,
 } from '../../components';
 import { colors, spacing } from '../../constants';
 import { useStudyStore } from '../../stores/studyStore';
@@ -31,6 +32,11 @@ export default function StudyScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [showPomodoroSettings, setShowPomodoroSettings] = useState(false);
   const [showPomodoroTimer, setShowPomodoroTimer] = useState(false);
+  const [toast, setToast] = useState<{
+    visible: boolean;
+    message: string;
+    type: 'error' | 'info';
+  }>({ visible: false, message: '', type: 'info' });
 
   // Pomodoro store
   const {
@@ -64,12 +70,14 @@ export default function StudyScreen() {
 
   // Load queue and pomodoro data on mount
   useEffect(() => {
+    console.log('[STUDY_SCREEN] Component mounted, loading queue...');
     loadQueue();
     loadTodayPomodoros();
   }, []);
 
   // Determine current view state
   const getViewState = (): ViewState => {
+    console.log('[STUDY_SCREEN] getViewState - loading:', loading, 'queue.length:', queue.length, 'currentIndex:', currentIndex);
     if (loading && queue.length === 0) return 'loading';
     if (queue.length === 0) return 'empty';
     if (currentIndex >= queue.length) return 'complete';
@@ -77,7 +85,9 @@ export default function StudyScreen() {
   };
 
   const viewState = getViewState();
+  console.log('[STUDY_SCREEN] Current viewState:', viewState);
   const currentCard = queue[currentIndex];
+  console.log('[STUDY_SCREEN] currentCard:', currentCard ? `Card ID: ${currentCard.id}` : 'undefined');
 
   // Handle refresh
   const onRefresh = useCallback(async () => {
@@ -93,6 +103,11 @@ export default function StudyScreen() {
       nextCard();
     } catch (err) {
       console.error('Failed to submit review:', err);
+      setToast({
+        visible: true,
+        message: 'Failed to save your rating. Please try again.',
+        type: 'error',
+      });
     }
   };
 
@@ -105,7 +120,7 @@ export default function StudyScreen() {
   // Handle go to dashboard
   const handleGoToDashboard = () => {
     resetSession();
-    router.push('/(tabs)/');
+    router.replace('/(tabs)');
   };
 
   // Handle exit study mode
@@ -133,7 +148,7 @@ export default function StudyScreen() {
 
   // Render loading state
   if (viewState === 'loading') {
-    return <LoadingOverlay message="Loading your study queue..." />;
+    return <LoadingOverlay visible={true} message="Loading your study queue..." />;
   }
 
   // Render empty state
@@ -161,7 +176,7 @@ export default function StudyScreen() {
             }}
             secondaryAction={{
               label: 'Go to Dashboard',
-              onPress: () => router.push('/(tabs)/'),
+              onPress: () => router.replace('/(tabs)'),
             }}
             tip="Tip: Cards will appear here when they're due for review based on spaced repetition"
           />
@@ -284,6 +299,14 @@ export default function StudyScreen() {
         visible={showPomodoroSettings}
         onClose={() => setShowPomodoroSettings(false)}
       />
+
+      {/* Toast for error notifications */}
+      <Toast
+        visible={toast.visible}
+        message={toast.message}
+        type={toast.type}
+        onDismiss={() => setToast({ ...toast, visible: false })}
+      />
     </SafeAreaView>
   );
 }
@@ -333,7 +356,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary[100],
   },
   overdueBadge: {
-    backgroundColor: colors.warning[100],
+    backgroundColor: colors.warning[50],
   },
   badgeText: {
     fontSize: 11,

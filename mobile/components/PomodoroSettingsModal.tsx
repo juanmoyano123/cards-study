@@ -134,8 +134,8 @@ export function PomodoroSettingsModal({
             <Text
               style={[
                 styles.optionText,
-                currentValue / 60 === minutes && styles.optionTextSelected,
-              ]}
+                currentValue / 60 === minutes ? styles.optionTextSelected : undefined,
+              ] as any}
             >
               {minutes}m
             </Text>
@@ -204,9 +204,8 @@ export function PomodoroSettingsModal({
                   <Text
                     style={[
                       styles.optionText,
-                      localSettings.pomodorosUntilLongBreak === count &&
-                        styles.optionTextSelected,
-                    ]}
+                      localSettings.pomodorosUntilLongBreak === count ? styles.optionTextSelected : undefined,
+                    ] as any}
                   >
                     {count}
                   </Text>

@@ -80,7 +80,11 @@ export const useStudyStore = create<StudyState>((set, get) => ({
     try {
       set({ loading: true, error: null });
 
+      console.log('[STUDY_STORE] Loading queue with options:', options);
       const response: StudyQueueResponse = await studyService.getStudyQueue(options);
+      console.log('[STUDY_STORE] Queue response:', JSON.stringify(response, null, 2));
+      console.log('[STUDY_STORE] Cards count:', response.cards.length);
+      console.log('[STUDY_STORE] Total due:', response.total_due);
 
       set({
         queue: response.cards,
@@ -99,8 +103,10 @@ export const useStudyStore = create<StudyState>((set, get) => ({
         ratingsEasy: 0,
         sessionSummary: null,
       });
+
+      console.log('[STUDY_STORE] State updated. Queue length in store:', response.cards.length);
     } catch (error) {
-      console.error('Failed to load study queue:', error);
+      console.error('[STUDY_STORE] Failed to load study queue:', error);
       const message =
         error instanceof Error ? error.message : 'Failed to load study queue';
       set({ error: message });

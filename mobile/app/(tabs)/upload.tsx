@@ -187,8 +187,8 @@ export default function UploadScreen() {
         id: card.id,
         question: card.question,
         answer: card.answer,
-        explanation: card.explanation,
-        difficulty: card.difficulty,
+        explanation: undefined,
+        difficulty: card.difficulty ?? 3, // Default to medium difficulty
         tags: card.tags || [],
         selected: true, // All cards selected by default
       }));
@@ -372,7 +372,7 @@ export default function UploadScreen() {
           <Upload size={20} color={activeTab === 'pdf' ? colors.primary[500] : colors.neutral[500]} />
           <Text
             variant="button"
-            style={[styles.tabText, activeTab === 'pdf' && styles.tabTextActive]}
+            style={[styles.tabText, activeTab === 'pdf' && styles.tabTextActive] as any}
           >
             Upload PDF
           </Text>
@@ -385,7 +385,7 @@ export default function UploadScreen() {
           <Type size={20} color={activeTab === 'text' ? colors.primary[500] : colors.neutral[500]} />
           <Text
             variant="button"
-            style={[styles.tabText, activeTab === 'text' && styles.tabTextActive]}
+            style={[styles.tabText, activeTab === 'text' && styles.tabTextActive] as any}
           >
             Paste Text
           </Text>
@@ -623,7 +623,7 @@ const styles = StyleSheet.create({
   },
   errorCard: {
     backgroundColor: colors.error[50],
-    borderColor: colors.error[200],
+    borderColor: colors.error[500],
     marginBottom: spacing[4],
   },
   errorText: {

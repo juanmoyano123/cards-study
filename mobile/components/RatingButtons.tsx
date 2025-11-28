@@ -114,7 +114,7 @@ function RatingButton({
           style={[
             styles.buttonLabel,
             { color: config.color },
-          ]}
+          ] as any}
         >
           {config.label}
         </Text>
@@ -122,7 +122,7 @@ function RatingButton({
           style={[
             styles.intervalText,
             { color: config.color },
-          ]}
+          ] as any}
         >
           {interval}
         </Text>

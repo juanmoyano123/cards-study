@@ -10,7 +10,6 @@ export { flashcardsService } from './flashcardsService';
 export { studyService } from './studyService';
 export { pomodoroService } from './pomodoroService';
 
-export type { ExtractTextRequest, ExtractTextResponse } from './materialsService';
 export type {
   GenerateFlashcardsRequest,
   GenerateFlashcardsResponse,

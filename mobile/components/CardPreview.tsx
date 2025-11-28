@@ -62,8 +62,8 @@ export const CardPreview = React.memo<CardPreviewProps>(({
       variant="outlined"
       style={[
         styles.cardItem,
-        !item.selected && styles.cardItemUnselected,
-      ]}
+        !item.selected ? styles.cardItemUnselected : undefined,
+      ] as any}
     >
       {/* Header with checkbox and actions */}
       <View style={styles.cardHeader}>
@@ -132,7 +132,7 @@ export const CardPreview = React.memo<CardPreviewProps>(({
             <Text variant="caption" color="secondary" style={styles.sectionLabel}>
               EXPLANATION
             </Text>
-            <Text variant="small" color="secondary">
+            <Text variant="caption" color="secondary">
               {item.explanation}
             </Text>
           </View>
@@ -141,8 +141,8 @@ export const CardPreview = React.memo<CardPreviewProps>(({
         {/* Footer with difficulty and tags */}
         <View style={styles.cardFooter}>
           <Badge
-            text={getDifficultyLabel(item.difficulty)}
-            color={getDifficultyColor(item.difficulty)}
+            label={getDifficultyLabel(item.difficulty)}
+            variant={item.difficulty <= 2 ? 'success' : item.difficulty <= 3 ? 'warning' : 'error'}
             size="sm"
           />
 
@@ -151,7 +151,7 @@ export const CardPreview = React.memo<CardPreviewProps>(({
               {item.tags.slice(0, 3).map((tag, idx) => (
                 <Badge
                   key={idx}
-                  text={tag}
+                  label={tag}
                   variant="neutral"
                   size="sm"
                 />
@@ -173,7 +173,7 @@ export const CardPreview = React.memo<CardPreviewProps>(({
       {/* Selection Controls */}
       <View style={styles.controlsContainer}>
         <View style={styles.selectionInfo}>
-          <Text variant="body" weight="medium">
+          <Text variant="body" style={styles.selectionText}>
             {selectedCount} of {totalCount} selected
           </Text>
         </View>
@@ -218,6 +218,9 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border.default,
   },
   selectionInfo: {},
+  selectionText: {
+    fontWeight: '500',
+  },
   selectionActions: {
     flexDirection: 'row',
     gap: spacing[2],

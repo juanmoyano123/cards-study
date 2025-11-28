@@ -41,18 +41,19 @@ export const Skeleton: React.FC<SkeletonProps> = ({
     return () => animation.stop();
   }, [opacity]);
 
+  const containerStyle = [
+    styles.skeleton,
+    {
+      width,
+      height,
+      borderRadius: radius,
+    },
+    style,
+  ];
+
   return (
     <Animated.View
-      style={[
-        styles.skeleton,
-        {
-          width,
-          height,
-          borderRadius: radius,
-          opacity,
-        },
-        style,
-      ]}
+      style={[containerStyle, { opacity }] as any}
       accessibilityRole="progressbar"
       accessibilityLabel="Loading content"
     />

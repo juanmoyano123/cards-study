@@ -130,7 +130,7 @@ export const Heatmap: React.FC<HeatmapProps> = ({ data, onDayPress }) => {
                 key={index}
                 variant="caption"
                 color="secondary"
-                style={[styles.monthLabel, { width: 12 }]}
+                style={[styles.monthLabel, { width: 12 }] as any}
               >
                 {label}
               </Text>

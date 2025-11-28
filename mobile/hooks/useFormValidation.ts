@@ -177,7 +177,7 @@ export function useFormValidation<T extends Record<string, FieldConfig>>(config:
   const getFieldProps = useCallback(
     (name: string) => ({
       value: fields[name]?.value || '',
-      error: fields[name]?.touched ? fields[name]?.error : undefined,
+      error: fields[name]?.touched ? (fields[name]?.error || undefined) : undefined,
       onChangeText: (value: string) => setValue(name, value),
       onBlur: () => setTouched(name),
     }),

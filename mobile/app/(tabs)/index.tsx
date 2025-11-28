@@ -230,14 +230,14 @@ export default function DashboardScreen() {
             title={`Study Now (${stats?.cards_due_today || 0} due)`}
             onPress={handleStudy}
             fullWidth
-            size="large"
+            size="lg"
           />
           <Button
             title="Upload Material"
             onPress={handleUpload}
             variant="outline"
             fullWidth
-            size="large"
+            size="lg"
           />
         </View>
       )}

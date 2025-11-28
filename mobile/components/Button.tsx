@@ -12,7 +12,7 @@ import {
 import * as Haptics from 'expo-haptics';
 import { colors, spacing, borderRadius, textStyles } from '../constants';
 
-export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
+export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'warning';
 export type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface ButtonProps {
@@ -107,7 +107,7 @@ export const Button: React.FC<ButtonProps> = ({
       >
         {loading ? (
           <ActivityIndicator
-            color={variant === 'primary' ? colors.white : colors.primary[500]}
+            color={variant === 'primary' || variant === 'warning' ? colors.white : colors.primary[500]}
             size="small"
           />
         ) : children ? (
@@ -146,6 +146,10 @@ const styles = StyleSheet.create({
   ghost: {
     backgroundColor: 'transparent',
     borderColor: 'transparent',
+  },
+  warning: {
+    backgroundColor: colors.warning[500],
+    borderColor: colors.warning[500],
   },
 
   // Sizes
@@ -191,6 +195,9 @@ const styles = StyleSheet.create({
   },
   ghostText: {
     color: colors.neutral[600],
+  },
+  warningText: {
+    color: colors.white,
   },
 
   // Size text

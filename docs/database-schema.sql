@@ -21,6 +21,7 @@ CREATE TABLE users (
   email VARCHAR(255) UNIQUE NOT NULL,
   name VARCHAR(255) NOT NULL,
   avatar_url TEXT,
+  password_hash VARCHAR,  -- For local auth, NULL when using Supabase Auth
 
   -- User preferences
   daily_card_limit INTEGER DEFAULT 100,

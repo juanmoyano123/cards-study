@@ -39,7 +39,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         // Optionally verify token with backend
         try {
           const response = await api.get('/auth/me');
-          set({ user: response.data });
+          set({ user: response.data as User });
         } catch (error) {
           // Token invalid, clear auth
           console.error('Token validation failed:', error);
@@ -68,7 +68,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         name: credentials.name,
       });
 
-      const { access_token } = response.data;
+      const { access_token } = response.data as { access_token: string };
 
       // Get user data after signup
       const userResponse = await api.get('/auth/me', {
@@ -76,7 +76,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           Authorization: `Bearer ${access_token}`,
         },
       });
-      const user = userResponse.data;
+      const user = userResponse.data as User;
 
       // Store token in secure storage and user in async storage
       await secureStorage.setItem('auth_token', access_token);
@@ -106,7 +106,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         password: credentials.password,
       });
 
-      const { access_token, token_type } = response.data;
+      const { access_token, token_type } = response.data as { access_token: string; token_type: string };
 
       // Get user data
       const userResponse = await api.get('/auth/me', {
@@ -115,7 +115,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
         },
       });
 
-      const user = userResponse.data;
+      const user = userResponse.data as User;
 
       // Store token in secure storage and user in async storage
       await secureStorage.setItem('auth_token', access_token);
@@ -157,7 +157,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ loading: true });
 
       const response = await api.put('/auth/me', data);
-      const updatedUser = response.data;
+      const updatedUser = response.data as User;
 
       // Update stored user
       await AsyncStorage.setItem('user', JSON.stringify(updatedUser));

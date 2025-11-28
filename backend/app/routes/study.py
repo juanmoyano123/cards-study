@@ -123,24 +123,40 @@ async def get_study_queue(
 
     all_cards = query.all()
 
+    # Debug logging
+    print(f"🔍 [STUDY_QUEUE] user_id: {user_id}")
+    print(f"🔍 [STUDY_QUEUE] Today: {today}")
+    print(f"🔍 [STUDY_QUEUE] Query returned {len(all_cards)} cards")
+    for i, (flashcard, stats) in enumerate(all_cards[:3]):  # Log first 3
+        print(f"🔍 [STUDY_QUEUE] Card {i}: id={flashcard.id}, stats={stats}")
+        if stats:
+            print(f"   └─ due_date={stats.due_date}, total_reviews={stats.total_reviews}")
+
     # Categorize cards
     overdue_cards = []
     due_today = []
     new_cards = []
 
     for flashcard, stats in all_cards:
+        print(f"🔄 [CATEGORIZE] Card {flashcard.id}")
         if stats is None:
             # Card has no stats yet - it's new
+            print(f"   └─ Category: NEW (no stats)")
             new_cards.append((flashcard, None))
         elif stats.due_date is None or stats.total_reviews == 0:
             # Never reviewed - it's new
+            print(f"   └─ Category: NEW (due_date={stats.due_date}, total_reviews={stats.total_reviews})")
             new_cards.append((flashcard, stats))
         elif stats.due_date < today:
             # Overdue - stats guaranteed to be non-None here
+            print(f"   └─ Category: OVERDUE (due_date={stats.due_date} < {today})")
             overdue_cards.append((flashcard, stats))
         elif stats.due_date == today:
             # Due today - stats guaranteed to be non-None here
+            print(f"   └─ Category: DUE_TODAY (due_date={stats.due_date} == {today})")
             due_today.append((flashcard, stats))
+        else:
+            print(f"   └─ Category: FUTURE (due_date={stats.due_date} > {today}) - SKIPPED")
         # Future cards are not included
 
     # Sort overdue by days overdue (most overdue first)
@@ -156,6 +172,9 @@ async def get_study_queue(
         key=lambda x: -x[1].ease_factor
     )
 
+    print(f"📊 [SUMMARY] Overdue: {len(overdue_cards)}, Due Today: {len(due_today)}, New: {len(new_cards)}")
+    print(f"⚙️ [PARAMS] include_new={include_new}, new_cards_limit={new_cards_limit}, limit={limit}")
+
     # Build the queue
     queue = []
 
@@ -164,12 +183,16 @@ async def get_study_queue(
         if len(queue) >= limit:
             break
         queue.append(_build_study_card(flashcard, stats))
+    print(f"✅ [QUEUE] Added {len(queue)} overdue cards")
 
     # Add due today
+    due_added = 0
     for flashcard, stats in due_today:
         if len(queue) >= limit:
             break
         queue.append(_build_study_card(flashcard, stats))
+        due_added += 1
+    print(f"✅ [QUEUE] Added {due_added} due today cards, total now: {len(queue)}")
 
     # Add new cards if allowed
     if include_new:
@@ -181,6 +204,11 @@ async def get_study_queue(
                 break
             queue.append(_build_study_card(flashcard, stats))
             new_added += 1
+        print(f"✅ [QUEUE] Added {new_added} new cards, total now: {len(queue)}")
+    else:
+        print(f"⚠️ [QUEUE] Skipped new cards (include_new=False)")
+
+    print(f"🎯 [FINAL] Returning {len(queue)} cards")
 
     return StudyQueueResponse(
         cards=queue,

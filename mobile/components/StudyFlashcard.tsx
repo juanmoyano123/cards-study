@@ -101,7 +101,7 @@ export const StudyFlashcard = React.memo(function StudyFlashcard({ card, isFlipp
               { borderColor: getMasteryColor(card.mastery_level) }
             ]}
           >
-            <Text style={[styles.masteryText, { color: getMasteryColor(card.mastery_level) }]}>
+            <Text style={[styles.masteryText, { color: getMasteryColor(card.mastery_level) }] as any}>
               {card.mastery_level.charAt(0).toUpperCase() + card.mastery_level.slice(1)}
             </Text>
           </View>
@@ -140,7 +140,7 @@ export const StudyFlashcard = React.memo(function StudyFlashcard({ card, isFlipp
               { borderColor: getMasteryColor(card.mastery_level) }
             ]}
           >
-            <Text style={[styles.masteryText, { color: getMasteryColor(card.mastery_level) }]}>
+            <Text style={[styles.masteryText, { color: getMasteryColor(card.mastery_level) }] as any}>
               {card.mastery_level.charAt(0).toUpperCase() + card.mastery_level.slice(1)}
             </Text>
           </View>

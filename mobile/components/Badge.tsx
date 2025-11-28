@@ -121,8 +121,9 @@ export const DotBadge: React.FC<DotBadgeProps> = ({
   if (!shouldShow) return null;
 
   const getBackgroundColor = () => {
-    const colorMap = {
+    const colorMap: Record<BadgeVariant, string> = {
       default: colors.neutral[500],
+      neutral: colors.neutral[500],
       primary: colors.primary[500],
       success: colors.success[500],
       warning: colors.warning[500],

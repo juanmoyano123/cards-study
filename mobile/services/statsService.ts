@@ -2,7 +2,7 @@
  * Stats Service - API calls for statistics and analytics
  */
 
-import api from './api';
+import { api } from './api';
 
 export interface HeatmapDay {
   date: string;

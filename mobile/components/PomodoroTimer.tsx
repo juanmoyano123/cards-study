@@ -189,7 +189,7 @@ export function PomodoroTimer({
             <BookOpen size={14} color={colors.primary[600]} />
           )}
         </View>
-        <Text style={[styles.compactTime, isBreak && styles.compactTimeBreak]}>
+        <Text style={[styles.compactTime, isBreak && styles.compactTimeBreak] as any}>
           {formatTime(timeRemaining)}
         </Text>
         {completedPomodoros > 0 && (
@@ -257,7 +257,7 @@ export function PomodoroTimer({
 
           {/* Timer Text */}
           <View style={styles.timerTextContainer}>
-            <Text style={[styles.timerText, isBreak && styles.timerTextBreak]}>
+            <Text style={[styles.timerText, isBreak && styles.timerTextBreak] as any}>
               {formatTime(timeRemaining)}
             </Text>
             <Text style={styles.phaseText}>

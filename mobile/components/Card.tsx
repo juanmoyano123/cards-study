@@ -4,7 +4,7 @@ import { colors, spacing, borderRadius } from '../constants';
 
 interface CardProps {
   children: React.ReactNode;
-  variant?: 'default' | 'elevated' | 'outlined';
+  variant?: 'default' | 'elevated' | 'outlined' | 'flat';
   padding?: keyof typeof spacing;
   onPress?: () => void;
   style?: ViewStyle;
@@ -87,5 +87,9 @@ const styles = StyleSheet.create({
   outlined: {
     borderWidth: 2,
     borderColor: colors.primary[500],
+  },
+  flat: {
+    backgroundColor: colors.neutral[50],
+    borderWidth: 0,
   },
 });

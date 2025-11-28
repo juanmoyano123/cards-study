@@ -9,7 +9,7 @@ import {
 } from 'react-native';
 import { colors, spacing, borderRadius, fontSize, lineHeight } from '../constants';
 
-interface TextareaProps extends Omit<TextInputProps, 'multiline'> {
+interface TextareaProps {
   label?: string;
   error?: string;
   helperText?: string;
@@ -21,6 +21,13 @@ interface TextareaProps extends Omit<TextInputProps, 'multiline'> {
   inputStyle?: ViewStyle;
   accessibilityLabel?: string;
   accessibilityHint?: string;
+  value?: string;
+  onChangeText?: (text: string) => void;
+  placeholder?: string;
+  maxLength?: number;
+  editable?: boolean;
+  onBlur?: () => void;
+  onFocus?: () => void;
 }
 
 export const Textarea: React.FC<TextareaProps> = ({
@@ -37,7 +44,11 @@ export const Textarea: React.FC<TextareaProps> = ({
   accessibilityHint,
   maxLength,
   value,
-  ...props
+  onChangeText,
+  placeholder,
+  editable = true,
+  onBlur: externalOnBlur,
+  onFocus: externalOnFocus,
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const hasError = !!error;
@@ -58,9 +69,15 @@ export const Textarea: React.FC<TextareaProps> = ({
         ]}
       >
         <TextInput
-          style={[styles.input, { minHeight: minHeight - spacing[3] * 2 }, inputStyle]}
-          onFocus={() => setIsFocused(true)}
-          onBlur={() => setIsFocused(false)}
+          style={[styles.input, { minHeight: minHeight - spacing[3] * 2 }, inputStyle as any]}
+          onFocus={() => {
+            setIsFocused(true);
+            externalOnFocus?.();
+          }}
+          onBlur={() => {
+            setIsFocused(false);
+            externalOnBlur?.();
+          }}
           multiline
           textAlignVertical="top"
           placeholderTextColor={colors.neutral[400]}
@@ -68,7 +85,9 @@ export const Textarea: React.FC<TextareaProps> = ({
           accessibilityHint={accessibilityHint}
           maxLength={maxLength}
           value={value}
-          {...props}
+          onChangeText={onChangeText}
+          placeholder={placeholder}
+          editable={editable}
         />
       </View>
 

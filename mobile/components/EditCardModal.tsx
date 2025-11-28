@@ -185,7 +185,7 @@ export const EditCardModal: React.FC<EditCardModalProps> = ({
 
             {/* Difficulty */}
             <View style={styles.difficultyContainer}>
-              <Text variant="caption" weight="medium" style={styles.fieldLabel}>
+              <Text variant="caption" style={styles.fieldLabel}>
                 Difficulty Level
               </Text>
               <View style={styles.difficultyOptions}>
@@ -199,11 +199,11 @@ export const EditCardModal: React.FC<EditCardModalProps> = ({
                     onPress={() => setDifficulty(option.value)}
                   >
                     <Text
-                      variant="small"
+                      variant="caption"
                       style={[
                         styles.difficultyText,
-                        difficulty === option.value && styles.difficultyTextActive,
-                      ]}
+                        difficulty === option.value ? styles.difficultyTextActive : undefined,
+                      ] as any}
                     >
                       {option.label}
                     </Text>
@@ -224,10 +224,10 @@ export const EditCardModal: React.FC<EditCardModalProps> = ({
 
             {/* Helper Text */}
             <Card variant="outlined" style={styles.helperCard}>
-              <Text variant="small" color="secondary">
+              <Text variant="caption" color="secondary">
                 * Required fields
               </Text>
-              <Text variant="small" color="secondary" style={styles.helperTip}>
+              <Text variant="caption" color="secondary" style={styles.helperTip}>
                 Tip: Keep questions clear and specific. Answers should be concise but
                 complete.
               </Text>
@@ -286,6 +286,7 @@ const styles = StyleSheet.create({
     marginBottom: spacing[2],
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+    fontWeight: '500',
   },
   difficultyContainer: {
     marginBottom: spacing[4],
