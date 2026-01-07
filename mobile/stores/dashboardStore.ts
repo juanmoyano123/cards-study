@@ -3,12 +3,13 @@
  */
 
 import { create } from 'zustand';
-import { DashboardStats, getDashboardStats, getTodayStats, TodayStats } from '../services/statsService';
+import { DashboardStats, getDashboardStats, getTodayStats, TodayStats, DailyProgress, getDailyProgress } from '../services/statsService';
 
 interface DashboardStore {
   // State
   stats: DashboardStats | null;
   todayStats: TodayStats | null;
+  dailyProgress: DailyProgress | null;
   loading: boolean;
   error: string | null;
   lastFetched: Date | null;
@@ -16,6 +17,7 @@ interface DashboardStore {
   // Actions
   loadDashboardStats: () => Promise<void>;
   loadTodayStats: () => Promise<void>;
+  loadDailyProgress: () => Promise<void>;
   refresh: () => Promise<void>;
   clearError: () => void;
   reset: () => void;
@@ -24,6 +26,7 @@ interface DashboardStore {
 const initialState = {
   stats: null,
   todayStats: null,
+  dailyProgress: null,
   loading: false,
   error: null,
   lastFetched: null,
@@ -77,11 +80,36 @@ export const useDashboardStore = create<DashboardStore>((set, get) => ({
   },
 
   /**
+   * Load daily progress toward goal
+   */
+  loadDailyProgress: async () => {
+    set({ loading: true, error: null });
+
+    try {
+      const dailyProgress = await getDailyProgress();
+      set({
+        dailyProgress,
+        loading: false,
+        lastFetched: new Date(),
+      });
+    } catch (error: any) {
+      console.error('Error loading daily progress:', error);
+      set({
+        loading: false,
+        error: error.response?.data?.detail || 'Failed to load daily progress',
+      });
+    }
+  },
+
+  /**
    * Refresh dashboard stats
    */
   refresh: async () => {
-    const { loadDashboardStats } = get();
-    await loadDashboardStats();
+    const { loadDashboardStats, loadDailyProgress } = get();
+    await Promise.all([
+      loadDashboardStats(),
+      loadDailyProgress(),
+    ]);
   },
 
   /**

@@ -12,7 +12,7 @@ from datetime import datetime
 from app.config import settings
 
 # Import routes
-from app.routes import auth, materials, flashcards, study, stats
+from app.routes import auth, materials, flashcards, study, stats, goals
 
 
 @asynccontextmanager
@@ -96,6 +96,7 @@ app.include_router(materials.router, prefix="/materials", tags=["Materials"])
 app.include_router(flashcards.router, prefix="/flashcards", tags=["Flashcards"])
 app.include_router(study.router, prefix="/study", tags=["Study"])
 app.include_router(stats.router, prefix="/stats", tags=["Stats"])
+app.include_router(goals.router, prefix="/goals", tags=["Goals"])
 
 
 # Global exception handler

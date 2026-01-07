@@ -30,6 +30,12 @@ from app.schemas.flashcard import (
     FlashcardConfirmRequest,
 )
 
+from app.schemas.goal import (
+    UserGoalResponse,
+    UserGoalUpdate,
+    DailyProgressResponse,
+)
+
 __all__ = [
     # Auth
     "SignupRequest",
@@ -53,4 +59,8 @@ __all__ = [
     "FlashcardGenerateRequest",
     "FlashcardGenerateResponse",
     "FlashcardConfirmRequest",
+    # Goal
+    "UserGoalResponse",
+    "UserGoalUpdate",
+    "DailyProgressResponse",
 ]

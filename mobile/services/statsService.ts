@@ -50,6 +50,17 @@ export interface TodayStats {
   current_streak: number;
 }
 
+export interface DailyProgress {
+  goal: number;
+  progress: number;
+  remaining: number;
+  percentage: number;
+  goal_type: 'easy_ratings' | 'cards_studied' | 'study_minutes';
+  easy_ratings_today: number;
+  cards_studied_today: number;
+  study_minutes_today: number;
+}
+
 /**
  * Get complete dashboard statistics
  */
@@ -63,5 +74,13 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
  */
 export const getTodayStats = async (): Promise<TodayStats> => {
   const response = await api.get<TodayStats>('/stats/today');
+  return response.data;
+};
+
+/**
+ * Get daily progress toward user's goal
+ */
+export const getDailyProgress = async (): Promise<DailyProgress> => {
+  const response = await api.get<DailyProgress>('/stats/daily-progress');
   return response.data;
 };

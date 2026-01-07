@@ -3,6 +3,7 @@ import { View, StyleSheet, ScrollView, RefreshControl, Alert } from 'react-nativ
 import { router } from 'expo-router';
 import { FileText } from 'lucide-react-native';
 import { Card, Text, Button, Heatmap, LoadingOverlay } from '../../components';
+import { ProgressCircle } from '../../components/Progress';
 import { useAuthStore } from '../../stores/authStore';
 import { useDashboardStore } from '../../stores/dashboardStore';
 import { colors, spacing } from '../../constants';
@@ -10,11 +11,12 @@ import { HeatmapDay } from '../../services/statsService';
 
 export default function DashboardScreen() {
   const { user } = useAuthStore();
-  const { stats, loading, error, loadDashboardStats, clearError } = useDashboardStore();
+  const { stats, dailyProgress, loading, error, loadDashboardStats, loadDailyProgress, clearError } = useDashboardStore();
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     loadDashboardStats();
+    loadDailyProgress();
   }, []);
 
   useEffect(() => {
@@ -26,7 +28,7 @@ export default function DashboardScreen() {
 
   const handleRefresh = async () => {
     setRefreshing(true);
-    await loadDashboardStats();
+    await Promise.all([loadDashboardStats(), loadDailyProgress()]);
     setRefreshing(false);
   };
 
@@ -69,59 +71,101 @@ export default function DashboardScreen() {
         </Text>
       </View>
 
-      {/* Stats Cards Row 1 */}
-      <View style={styles.statsContainer}>
-        <Card variant="elevated" style={styles.statCard}>
-          <Text variant="caption" color="secondary">
-            Current Streak
-          </Text>
-          <Text variant="h1" color="brand" style={styles.statValue}>
-            {stats?.current_streak || 0}
-          </Text>
-          <Text variant="caption" color="secondary">
-            days 🔥
-          </Text>
-        </Card>
+      {/* Daily Goal Card */}
+      {hasCards && dailyProgress && (
+        <Card variant="elevated" style={styles.goalCard}>
+          <View style={styles.goalHeader}>
+            <Text variant="h3">Daily Goal 🎯</Text>
+            <Text variant="caption" color="secondary">
+              {dailyProgress.goal_type === 'easy_ratings' && 'Cards mastered'}
+              {dailyProgress.goal_type === 'cards_studied' && 'Cards studied'}
+              {dailyProgress.goal_type === 'study_minutes' && 'Minutes'}
+            </Text>
+          </View>
 
-        <Card variant="elevated" style={styles.statCard}>
-          <Text variant="caption" color="secondary">
-            Due Today
-          </Text>
-          <Text variant="h1" color="warning" style={styles.statValue}>
-            {stats?.cards_due_today || 0}
-          </Text>
-          <Text variant="caption" color="secondary">
-            cards 📚
-          </Text>
-        </Card>
-      </View>
+          <View style={styles.goalContent}>
+            <ProgressCircle
+              value={dailyProgress.percentage}
+              size={120}
+              strokeWidth={12}
+              variant={dailyProgress.percentage >= 100 ? 'success' : 'primary'}
+              showLabel={true}
+            />
 
-      {/* Stats Cards Row 2 */}
-      <View style={styles.statsContainer}>
-        <Card variant="elevated" style={styles.statCard}>
-          <Text variant="caption" color="secondary">
-            Total Cards
-          </Text>
-          <Text variant="h1" color="info" style={styles.statValue}>
-            {stats?.total_cards || 0}
-          </Text>
-          <Text variant="caption" color="secondary">
-            created 📝
-          </Text>
-        </Card>
+            <View style={styles.goalStats}>
+              <Text variant="h1" style={styles.goalProgress}>
+                {dailyProgress.progress}/{dailyProgress.goal}
+              </Text>
+              <Text variant="body" color="secondary" style={styles.goalDescription}>
+                {dailyProgress.remaining === 0
+                  ? '🎉 Goal completed! Amazing work!'
+                  : `${dailyProgress.remaining} more to go!`}
+              </Text>
 
-        <Card variant="elevated" style={styles.statCard}>
-          <Text variant="caption" color="secondary">
-            Mastered
-          </Text>
-          <Text variant="h1" color="success" style={styles.statValue}>
-            {stats?.total_cards_mastered || 0}
-          </Text>
-          <Text variant="caption" color="secondary">
-            cards ✨
-          </Text>
+              {dailyProgress.goal_type === 'easy_ratings' && (
+                <View style={styles.goalBreakdown}>
+                  <Text variant="caption" color="secondary">
+                    📚 {dailyProgress.cards_studied_today} cards studied today
+                  </Text>
+                  <Text variant="caption" color="secondary">
+                    ✨ {dailyProgress.easy_ratings_today} mastered
+                  </Text>
+                </View>
+              )}
+            </View>
+          </View>
         </Card>
-      </View>
+      )}
+
+      {/* Today's Session */}
+      {hasCards && (
+        <Card variant="default" style={styles.todaySessionCard}>
+          <Text variant="h3" style={styles.sectionTitle}>
+            📊 Today's Session
+          </Text>
+          <View style={styles.sessionStats}>
+            <View style={styles.sessionStat}>
+              <Text variant="h2" color="brand">{stats?.cards_studied_today || 0}</Text>
+              <Text variant="caption" color="secondary">Cards Studied</Text>
+            </View>
+            <View style={styles.sessionDivider} />
+            <View style={styles.sessionStat}>
+              <Text variant="h2" color="warning">{stats?.cards_due_today || 0}</Text>
+              <Text variant="caption" color="secondary">Cards Due</Text>
+            </View>
+          </View>
+        </Card>
+      )}
+
+      {/* Streak Card */}
+      {hasCards && (
+        <View style={styles.statsContainer}>
+          <Card variant="elevated" style={styles.statCard}>
+            <Text variant="caption" color="secondary">
+              Current Streak
+            </Text>
+            <Text variant="h1" color="brand" style={styles.statValue}>
+              {stats?.current_streak || 0}
+            </Text>
+            <Text variant="caption" color="secondary">
+              days 🔥
+            </Text>
+          </Card>
+
+          <Card variant="elevated" style={styles.statCard}>
+            <Text variant="caption" color="secondary">
+              Longest Streak
+            </Text>
+            <Text variant="h1" color="success" style={styles.statValue}>
+              {stats?.longest_streak || 0}
+            </Text>
+            <Text variant="caption" color="secondary">
+              days 🏆
+            </Text>
+          </Card>
+        </View>
+      )}
+
 
       {/* Heatmap */}
       {hasCards && stats?.heatmap_data && (
@@ -165,33 +209,6 @@ export default function DashboardScreen() {
         </View>
       )}
 
-      {/* This Week Stats */}
-      {hasCards && (
-        <Card variant="outlined" style={styles.weekStatsCard}>
-          <Text variant="label" style={styles.weekStatsTitle}>
-            This Week
-          </Text>
-          <View style={styles.weekStatsContainer}>
-            <View style={styles.weekStat}>
-              <Text variant="h2" color="brand">
-                {stats?.cards_studied_this_week || 0}
-              </Text>
-              <Text variant="caption" color="secondary">
-                cards studied
-              </Text>
-            </View>
-            <View style={styles.weekStatDivider} />
-            <View style={styles.weekStat}>
-              <Text variant="h2" color="info">
-                {stats?.study_time_this_week || 0}
-              </Text>
-              <Text variant="caption" color="secondary">
-                minutes
-              </Text>
-            </View>
-          </View>
-        </Card>
-      )}
 
       {/* Empty State (only if no cards) */}
       {!hasCards && (
@@ -353,26 +370,51 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
-  weekStatsCard: {
-    padding: spacing[4],
+  goalCard: {
+    padding: spacing[5],
     marginBottom: spacing[4],
   },
-  weekStatsTitle: {
-    marginBottom: spacing[3],
-    fontWeight: '600',
+  goalHeader: {
+    marginBottom: spacing[4],
   },
-  weekStatsContainer: {
+  goalContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing[6],
+  },
+  goalStats: {
+    flex: 1,
+  },
+  goalProgress: {
+    marginBottom: spacing[2],
+  },
+  goalDescription: {
+    marginBottom: spacing[3],
+  },
+  goalBreakdown: {
+    gap: spacing[1],
+    paddingTop: spacing[2],
+    borderTopWidth: 1,
+    borderTopColor: colors.border.light,
+    marginTop: spacing[2],
+  },
+  todaySessionCard: {
+    padding: spacing[5],
+    marginBottom: spacing[4],
+  },
+  sessionStats: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  weekStat: {
+  sessionStat: {
     flex: 1,
     alignItems: 'center',
   },
-  weekStatDivider: {
+  sessionDivider: {
     width: 1,
-    height: 40,
+    height: 50,
     backgroundColor: colors.neutral[200],
+    marginHorizontal: spacing[4],
   },
   actionsContainer: {
     gap: spacing[3],

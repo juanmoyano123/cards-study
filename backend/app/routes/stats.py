@@ -14,12 +14,15 @@ from app.models.flashcard import Flashcard
 from app.models.card_stats import CardStats
 from app.models.study_session import StudySession
 from app.models.user_stats import UserStats
+from app.models.card_review import CardReview
+from app.models.user_goal import UserGoal
 from app.schemas.stats import (
     DashboardStats,
     TodayStats,
     HeatmapDay,
     SubjectProgress
 )
+from app.schemas.goal import DailyProgressResponse
 
 router = APIRouter()
 
@@ -350,4 +353,72 @@ async def get_today_stats(
         cards_studied=cards_studied,
         study_time_minutes=study_time,
         current_streak=current_streak
+    )
+
+
+@router.get("/daily-progress", response_model=DailyProgressResponse)
+async def get_daily_progress(
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user_id)
+):
+    """
+    Get daily progress toward user's goal.
+
+    Calculates progress based on user's goal type:
+    - easy_ratings: Count cards rated 4 (Easy) today
+    - cards_studied: Count total cards studied today
+    - study_minutes: Count total study minutes today
+    """
+    # Get user's goal
+    user_goal = db.query(UserGoal).filter(
+        UserGoal.user_id == user_id
+    ).first()
+
+    # Default goal if not set
+    if not user_goal:
+        user_goal = UserGoal(
+            user_id=user_id,
+            daily_cards_goal=20,
+            goal_type="easy_ratings"
+        )
+        db.add(user_goal)
+        db.commit()
+        db.refresh(user_goal)
+
+    today = date.today()
+
+    # Get today's session for basic stats
+    today_session = db.query(StudySession).filter(
+        and_(
+            StudySession.user_id == user_id,
+            StudySession.date == today
+        )
+    ).first()
+
+    cards_studied_today = today_session.cards_studied if today_session else 0
+    study_minutes_today = today_session.time_spent_minutes if today_session else 0
+    easy_ratings_today = today_session.cards_easy if today_session else 0
+
+    # Calculate progress based on goal type
+    progress = 0
+    if user_goal.goal_type == "easy_ratings":
+        progress = easy_ratings_today
+    elif user_goal.goal_type == "cards_studied":
+        progress = cards_studied_today
+    elif user_goal.goal_type == "study_minutes":
+        progress = study_minutes_today
+
+    # Calculate remaining and percentage
+    remaining = max(0, user_goal.daily_cards_goal - progress)
+    percentage = min(100.0, (progress / user_goal.daily_cards_goal * 100)) if user_goal.daily_cards_goal > 0 else 0
+
+    return DailyProgressResponse(
+        goal=user_goal.daily_cards_goal,
+        progress=progress,
+        remaining=remaining,
+        percentage=round(percentage, 1),
+        goal_type=user_goal.goal_type,
+        easy_ratings_today=easy_ratings_today,
+        cards_studied_today=cards_studied_today,
+        study_minutes_today=study_minutes_today
     )
