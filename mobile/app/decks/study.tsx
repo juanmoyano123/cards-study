@@ -22,7 +22,7 @@ import {
 import { colors, spacing } from '../../constants';
 import { materialsService } from '../../services/materialsService';
 import { studyService } from '../../services/studyService';
-import type { MaterialFlashcard } from '../../types';
+import type { MaterialFlashcard, StudyCard } from '../../types';
 
 type ViewState = 'loading' | 'empty' | 'studying' | 'complete';
 
@@ -33,7 +33,7 @@ export default function DeckStudyScreen() {
   }>();
   const { materialId, materialName } = params;
 
-  const [flashcards, setFlashcards] = useState<MaterialFlashcard[]>([]);
+  const [flashcards, setFlashcards] = useState<StudyCard[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -54,7 +54,28 @@ export default function DeckStudyScreen() {
       setLoading(true);
       const response = await materialsService.getMaterialFlashcards(materialId);
       console.log('[DECK_STUDY] Loaded flashcards:', response.flashcards.length);
-      setFlashcards(response.flashcards);
+
+      // Transform MaterialFlashcard to StudyCard
+      const studyCards: StudyCard[] = response.flashcards.map(card => ({
+        id: card.id,
+        question: card.question,
+        answer: card.answer,
+        explanation: card.explanation,
+        tags: card.tags,
+        difficulty: card.difficulty,
+        interval_days: 0,
+        ease_factor: 2.5,
+        review_count: card.stats?.total_reviews || 0,
+        mastery_level: (card.stats?.mastery_level as any) || 'new',
+        next_intervals: {
+          1: '0d',
+          2: '1d',
+          3: '3d',
+          4: '7d',
+        },
+      }));
+
+      setFlashcards(studyCards);
     } catch (error) {
       console.error('[DECK_STUDY] Error loading flashcards:', error);
       Alert.alert('Error', 'Failed to load flashcards. Please try again.');
@@ -254,7 +275,7 @@ export default function DeckStudyScreen() {
               {Math.round(progress)}%
             </Text>
           </View>
-          <ProgressBar progress={progress} />
+          <ProgressBar value={progress} />
         </View>
 
         {/* Flashcard */}
@@ -270,9 +291,9 @@ export default function DeckStudyScreen() {
         {isFlipped && (
           <View style={styles.ratingSection}>
             <RatingButtons
+              nextIntervals={currentCard.next_intervals}
               onRate={handleRate}
               disabled={submitting}
-              card={currentCard}
             />
           </View>
         )}
