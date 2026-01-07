@@ -9,6 +9,7 @@ from app.models.card_stats import CardStats
 from app.models.card_review import CardReview
 from app.models.study_session import StudySession
 from app.models.user_stats import UserStats
+from app.models.user_goal import UserGoal
 
 __all__ = [
     "User",
@@ -18,4 +19,5 @@ __all__ = [
     "CardReview",
     "StudySession",
     "UserStats",
+    "UserGoal",
 ]

@@ -24,12 +24,16 @@ export default function ProfileScreen() {
   }, []);
 
   const handleSettingPress = (setting: string) => {
-    // TODO: Navigate to setting screens when implemented
-    setToast({
-      visible: true,
-      message: `${setting} settings coming soon!`,
-      type: 'info',
-    });
+    if (setting === 'Study Preferences') {
+      router.push('/settings/goals');
+    } else {
+      // TODO: Navigate to other setting screens when implemented
+      setToast({
+        visible: true,
+        message: `${setting} settings coming soon!`,
+        type: 'info',
+      });
+    }
   };
 
   const handleSignOut = async () => {
