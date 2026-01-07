@@ -262,7 +262,7 @@ async def list_materials(
         material_dict = MaterialResponse.model_validate(material).model_dump()
         # Count active flashcards for this material
         flashcard_count = db.query(Flashcard).filter(
-            Flashcard.study_material_id == material.id,
+            Flashcard.material_id == material.id,
             Flashcard.status == 'active',
             Flashcard.deleted_at.is_(None)
         ).count()
@@ -305,7 +305,7 @@ async def get_material(
     # Add flashcard count
     material_dict = MaterialResponse.model_validate(material).model_dump()
     flashcard_count = db.query(Flashcard).filter(
-        Flashcard.study_material_id == material.id,
+        Flashcard.material_id == material.id,
         Flashcard.status == 'active',
         Flashcard.deleted_at.is_(None)
     ).count()
@@ -421,7 +421,7 @@ async def get_material_flashcards(
 
     # Get all active flashcards for this material
     flashcards = db.query(Flashcard).filter(
-        Flashcard.study_material_id == uuid.UUID(material_id),
+        Flashcard.material_id == uuid.UUID(material_id),
         Flashcard.user_id == uuid.UUID(user_id),
         Flashcard.status == 'active',
         Flashcard.deleted_at.is_(None)
@@ -438,13 +438,13 @@ async def get_material_flashcards(
             "difficulty": card.difficulty,
             "tags": card.tags,
             "status": card.status,
-            "study_material_id": str(card.study_material_id) if card.study_material_id else None,
+            "study_material_id": str(card.material_id) if card.material_id else None,
             "created_at": card.created_at.isoformat() if card.created_at else None,
         }
 
         # Get stats for this card
         stats = db.query(CardStats).filter(
-            CardStats.flashcard_id == card.id,
+            CardStats.card_id == card.id,
             CardStats.user_id == uuid.UUID(user_id)
         ).first()
 
