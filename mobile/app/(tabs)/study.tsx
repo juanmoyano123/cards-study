@@ -171,14 +171,14 @@ export default function StudyScreen() {
                 : "You're all caught up! Upload some study materials to create new flashcards."
             }
             primaryAction={{
+              label: 'Browse My Decks',
+              onPress: () => router.push('/decks'),
+            }}
+            secondaryAction={{
               label: 'Upload Materials',
               onPress: () => router.push('/(tabs)/upload'),
             }}
-            secondaryAction={{
-              label: 'Go to Dashboard',
-              onPress: () => router.replace('/(tabs)'),
-            }}
-            tip="Tip: Cards will appear here when they're due for review based on spaced repetition"
+            tip="Tip: Browse your decks to study anytime, or wait for cards to appear here based on spaced repetition"
           />
         </ScrollView>
       </SafeAreaView>

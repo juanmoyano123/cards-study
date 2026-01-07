@@ -237,6 +237,8 @@ async def list_materials(
 
     Requires authentication.
     """
+    from app.models.flashcard import Flashcard
+
     # Base query
     query = db.query(StudyMaterial).filter(
         StudyMaterial.user_id == uuid.UUID(user_id),
@@ -254,8 +256,21 @@ async def list_materials(
     offset = (page - 1) * page_size
     materials = query.order_by(StudyMaterial.created_at.desc()).offset(offset).limit(page_size).all()
 
+    # Add flashcard count to each material
+    materials_with_count = []
+    for material in materials:
+        material_dict = MaterialResponse.model_validate(material).model_dump()
+        # Count active flashcards for this material
+        flashcard_count = db.query(Flashcard).filter(
+            Flashcard.study_material_id == material.id,
+            Flashcard.status == 'active',
+            Flashcard.deleted_at.is_(None)
+        ).count()
+        material_dict['flashcard_count'] = flashcard_count
+        materials_with_count.append(MaterialResponse(**material_dict))
+
     return MaterialListResponse(
-        materials=[MaterialResponse.model_validate(m) for m in materials],
+        materials=materials_with_count,
         total=total,
         page=page,
         page_size=page_size
@@ -273,6 +288,8 @@ async def get_material(
 
     Requires authentication and ownership.
     """
+    from app.models.flashcard import Flashcard
+
     material = db.query(StudyMaterial).filter(
         StudyMaterial.id == uuid.UUID(material_id),
         StudyMaterial.user_id == uuid.UUID(user_id),
@@ -285,7 +302,16 @@ async def get_material(
             detail="Material not found"
         )
 
-    return MaterialResponse.model_validate(material)
+    # Add flashcard count
+    material_dict = MaterialResponse.model_validate(material).model_dump()
+    flashcard_count = db.query(Flashcard).filter(
+        Flashcard.study_material_id == material.id,
+        Flashcard.status == 'active',
+        Flashcard.deleted_at.is_(None)
+    ).count()
+    material_dict['flashcard_count'] = flashcard_count
+
+    return MaterialResponse(**material_dict)
 
 
 @router.put("/{material_id}", response_model=MaterialResponse)
@@ -360,3 +386,86 @@ async def delete_material(
     db.commit()
 
     return None
+
+
+@router.get("/{material_id}/flashcards")
+async def get_material_flashcards(
+    material_id: str,
+    user_id: str = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all flashcards for a specific material.
+
+    Returns all active flashcards associated with this material,
+    regardless of their due_date (for manual/free study mode).
+
+    Requires authentication and ownership.
+    """
+    from app.models.flashcard import Flashcard
+    from app.models.card_stats import CardStats
+    from app.schemas.flashcard import FlashcardResponse
+
+    # Verify material ownership
+    material = db.query(StudyMaterial).filter(
+        StudyMaterial.id == uuid.UUID(material_id),
+        StudyMaterial.user_id == uuid.UUID(user_id),
+        StudyMaterial.deleted_at.is_(None)
+    ).first()
+
+    if not material:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Material not found"
+        )
+
+    # Get all active flashcards for this material
+    flashcards = db.query(Flashcard).filter(
+        Flashcard.study_material_id == uuid.UUID(material_id),
+        Flashcard.user_id == uuid.UUID(user_id),
+        Flashcard.status == 'active',
+        Flashcard.deleted_at.is_(None)
+    ).all()
+
+    # Build response with stats for each card
+    cards_with_stats = []
+    for card in flashcards:
+        card_dict = {
+            "id": str(card.id),
+            "question": card.question,
+            "answer": card.answer,
+            "explanation": card.explanation,
+            "difficulty": card.difficulty,
+            "tags": card.tags,
+            "status": card.status,
+            "study_material_id": str(card.study_material_id) if card.study_material_id else None,
+            "created_at": card.created_at.isoformat() if card.created_at else None,
+        }
+
+        # Get stats for this card
+        stats = db.query(CardStats).filter(
+            CardStats.flashcard_id == card.id,
+            CardStats.user_id == uuid.UUID(user_id)
+        ).first()
+
+        if stats:
+            card_dict["stats"] = {
+                "mastery_level": stats.mastery_level,
+                "total_reviews": stats.total_reviews,
+                "due_date": stats.due_date.isoformat() if stats.due_date else None,
+            }
+        else:
+            card_dict["stats"] = {
+                "mastery_level": "new",
+                "total_reviews": 0,
+                "due_date": None,
+            }
+
+        cards_with_stats.append(card_dict)
+
+    return {
+        "material_id": str(material.id),
+        "material_name": material.filename,
+        "flashcards": cards_with_stats,
+        "total": len(cards_with_stats)
+    }

@@ -1,5 +1,11 @@
 import { api } from './api';
-import type { StudyMaterial, ApiResponse, PaginatedResponse } from '../types';
+import type {
+  StudyMaterial,
+  ApiResponse,
+  PaginatedResponse,
+  MaterialFlashcardsResponse,
+  MaterialListResponse
+} from '../types';
 
 export interface UploadMaterialRequest {
   file?: any; // File from expo-document-picker
@@ -74,10 +80,10 @@ export const materialsService = {
    */
   async getMaterials(
     page: number = 1,
-    perPage: number = 20
-  ): Promise<PaginatedResponse<StudyMaterial>> {
-    const response = await api.get<PaginatedResponse<StudyMaterial>>(
-      `/materials?page=${page}&per_page=${perPage}`
+    pageSize: number = 20
+  ): Promise<MaterialListResponse> {
+    const response = await api.get<MaterialListResponse>(
+      `/materials?page=${page}&page_size=${pageSize}`
     );
     return response.data;
   },
@@ -86,20 +92,25 @@ export const materialsService = {
    * Get a specific material by ID
    */
   async getMaterial(id: string): Promise<StudyMaterial> {
-    const response = await api.get<ApiResponse<StudyMaterial>>(`/materials/${id}`);
-    if (response.data.error) {
-      throw new Error(response.data.error);
-    }
-    return response.data.data!;
+    const response = await api.get<StudyMaterial>(`/materials/${id}`);
+    return response.data;
+  },
+
+  /**
+   * Get all flashcards for a specific material
+   */
+  async getMaterialFlashcards(materialId: string): Promise<MaterialFlashcardsResponse> {
+    console.log('[MaterialsService] Fetching flashcards for material:', materialId);
+    const response = await api.get<MaterialFlashcardsResponse>(
+      `/materials/${materialId}/flashcards`
+    );
+    return response.data;
   },
 
   /**
    * Delete a material
    */
   async deleteMaterial(id: string): Promise<void> {
-    const response = await api.delete<ApiResponse<void>>(`/materials/${id}`);
-    if (response.data.error) {
-      throw new Error(response.data.error);
-    }
+    await api.delete(`/materials/${id}`);
   },
 };
