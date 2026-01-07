@@ -102,13 +102,14 @@ describe('flashcardsService', () => {
     it('fetches flashcards list successfully', async () => {
       const mockResponse = {
         data: {
-          flashcards: [
+          data: [
             { id: 'card-1', question: 'Q1', answer: 'A1' },
             { id: 'card-2', question: 'Q2', answer: 'A2' },
           ],
           total: 2,
           page: 1,
-          page_size: 50,
+          per_page: 50,
+          total_pages: 1,
         },
       };
 
@@ -117,16 +118,17 @@ describe('flashcardsService', () => {
       const result = await flashcardsService.getFlashcards(1, 50);
 
       expect(api.get).toHaveBeenCalledWith('/flashcards?page=1&per_page=50');
-      expect(result.flashcards).toHaveLength(2);
+      expect(result.data).toHaveLength(2);
     });
 
     it('includes status filter when provided', async () => {
       const mockResponse = {
         data: {
-          flashcards: [],
+          data: [],
           total: 0,
           page: 1,
-          page_size: 50,
+          per_page: 50,
+          total_pages: 0,
         },
       };
 

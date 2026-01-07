@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_
 from typing import List, Optional
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime, date, timedelta
 import uuid
 
@@ -26,6 +26,8 @@ router = APIRouter()
 
 class StudyCard(BaseModel):
     """Flashcard data for study mode."""
+    model_config = ConfigDict(from_attributes=True)
+
     id: str
     question: str
     answer: str
@@ -41,9 +43,6 @@ class StudyCard(BaseModel):
 
     # Preview of next intervals
     next_intervals: dict = {}
-
-    class Config:
-        orm_mode = True
 
 
 class StudyQueueResponse(BaseModel):

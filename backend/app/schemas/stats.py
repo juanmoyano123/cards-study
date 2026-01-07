@@ -2,22 +2,23 @@
 Stats schemas - Response models for statistics endpoints.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Dict
 from datetime import date
 
 
 class HeatmapDay(BaseModel):
     """Single day in heatmap."""
+    model_config = ConfigDict(from_attributes=True)
+
     date: date
     count: int = Field(..., description="Number of cards studied on this day")
-
-    class Config:
-        orm_mode = True
 
 
 class SubjectProgress(BaseModel):
     """Progress stats for a specific subject/category."""
+    model_config = ConfigDict(from_attributes=True)
+
     subject: str
     total_cards: int
     mastered_cards: int
@@ -25,12 +26,11 @@ class SubjectProgress(BaseModel):
     mastery_percentage: float
     last_studied: Optional[date] = None
 
-    class Config:
-        orm_mode = True
-
 
 class DashboardStats(BaseModel):
     """Complete dashboard statistics."""
+    model_config = ConfigDict(from_attributes=True)
+
     # Streak tracking
     current_streak: int = Field(0, description="Current consecutive days studying")
     longest_streak: int = Field(0, description="Longest streak ever achieved")
@@ -54,16 +54,12 @@ class DashboardStats(BaseModel):
     # Progress by subject
     progress_by_subject: List[SubjectProgress] = Field(default_factory=list)
 
-    class Config:
-        orm_mode = True
-
 
 class TodayStats(BaseModel):
     """Quick stats for today."""
+    model_config = ConfigDict(from_attributes=True)
+
     cards_due: int
     cards_studied: int
     study_time_minutes: int
     current_streak: int
-
-    class Config:
-        orm_mode = True
