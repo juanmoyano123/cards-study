@@ -61,6 +61,39 @@ export interface DailyProgress {
   study_minutes_today: number;
 }
 
+export interface ProblematicCard {
+  card_id: string;
+  question: string;
+  failed_reviews: number;
+  last_failed?: string;
+  average_rating: number;
+}
+
+export interface DeckMetrics {
+  deck_name: string;
+  total_cards: number;
+
+  // Rating distribution
+  easy_count: number;
+  good_count: number;
+  hard_count: number;
+  again_count: number;
+  new_count: number;
+
+  // Performance metrics
+  mastery_percentage: number;
+  average_rating: number;
+  failed_reviews_this_month: number;
+
+  // Study history
+  total_reviews: number;
+  last_studied?: string;
+  total_study_time_minutes: number;
+
+  // Problematic cards
+  problematic_cards: ProblematicCard[];
+}
+
 /**
  * Get complete dashboard statistics
  */
@@ -82,5 +115,13 @@ export const getTodayStats = async (): Promise<TodayStats> => {
  */
 export const getDailyProgress = async (): Promise<DailyProgress> => {
   const response = await api.get<DailyProgress>('/stats/daily-progress');
+  return response.data;
+};
+
+/**
+ * Get detailed metrics for a specific deck/subject
+ */
+export const getDeckMetrics = async (deckName: string): Promise<DeckMetrics> => {
+  const response = await api.get<DeckMetrics>(`/stats/deck/${encodeURIComponent(deckName)}/metrics`);
   return response.data;
 };

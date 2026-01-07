@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, RefreshControl, Alert } from 'react-native';
+import { View, StyleSheet, ScrollView, RefreshControl, Alert, TouchableOpacity } from 'react-native';
 import { router } from 'expo-router';
-import { FileText } from 'lucide-react-native';
+import { FileText, ChevronRight } from 'lucide-react-native';
 import { Card, Text, Button, Heatmap, LoadingOverlay } from '../../components';
 import { ProgressCircle } from '../../components/Progress';
 import { useAuthStore } from '../../stores/authStore';
@@ -45,6 +45,10 @@ export default function DashboardScreen() {
       day.date,
       `${day.count} card${day.count !== 1 ? 's' : ''} studied`
     );
+  };
+
+  const handleDeckPress = (deckName: string) => {
+    router.push(`/deck-metrics/${encodeURIComponent(deckName)}`);
   };
 
   const hasCards = stats && stats.total_cards > 0;
@@ -181,30 +185,39 @@ export default function DashboardScreen() {
             Progress by Subject
           </Text>
           {stats.progress_by_subject.map((subject, index) => (
-            <Card key={index} variant="default" style={styles.subjectCard}>
-              <View style={styles.subjectHeader}>
-                <Text variant="label">{subject.subject}</Text>
-                <Text variant="caption" color="success">
-                  {subject.mastery_percentage.toFixed(0)}% mastered
-                </Text>
-              </View>
-              <View style={styles.progressBar}>
-                <View
-                  style={[
-                    styles.progressFill,
-                    { width: `${subject.mastery_percentage}%` },
-                  ]}
-                />
-              </View>
-              <View style={styles.subjectStats}>
-                <Text variant="caption" color="secondary">
-                  {subject.mastered_cards}/{subject.total_cards} cards
-                </Text>
-                <Text variant="caption" color="warning">
-                  {subject.cards_due} due
-                </Text>
-              </View>
-            </Card>
+            <TouchableOpacity
+              key={index}
+              onPress={() => handleDeckPress(subject.subject)}
+              activeOpacity={0.7}
+            >
+              <Card variant="default" style={styles.subjectCard}>
+                <View style={styles.subjectHeader}>
+                  <Text variant="label">{subject.subject}</Text>
+                  <View style={styles.subjectHeaderRight}>
+                    <Text variant="caption" color="success" style={styles.masteryText}>
+                      {subject.mastery_percentage.toFixed(0)}% mastered
+                    </Text>
+                    <ChevronRight size={16} color={colors.neutral[400]} />
+                  </View>
+                </View>
+                <View style={styles.progressBar}>
+                  <View
+                    style={[
+                      styles.progressFill,
+                      { width: `${subject.mastery_percentage}%` },
+                    ]}
+                  />
+                </View>
+                <View style={styles.subjectStats}>
+                  <Text variant="caption" color="secondary">
+                    {subject.mastered_cards}/{subject.total_cards} cards
+                  </Text>
+                  <Text variant="caption" color="warning">
+                    {subject.cards_due} due
+                  </Text>
+                </View>
+              </Card>
+            </TouchableOpacity>
           ))}
         </View>
       )}
@@ -353,6 +366,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: spacing[2],
+  },
+  subjectHeaderRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing[1],
+  },
+  masteryText: {
+    marginRight: spacing[1],
   },
   progressBar: {
     height: 8,
