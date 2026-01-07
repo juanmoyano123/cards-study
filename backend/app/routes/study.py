@@ -159,17 +159,30 @@ async def get_study_queue(
             print(f"   └─ Category: FUTURE (due_date={stats.due_date} > {today}) - SKIPPED")
         # Future cards are not included
 
-    # Sort overdue by days overdue (most overdue first)
+    # Sort overdue cards by:
+    # 1. Failed reviews (most failures first - cards that need most practice)
+    # 2. Days overdue (most overdue first)
+    # 3. Ease factor (lowest ease = more difficult)
     # Note: All items in overdue_cards have non-None stats due to filtering above
     overdue_cards.sort(
-        key=lambda x: x[1].due_date,
-        reverse=False
+        key=lambda x: (
+            -x[1].failed_reviews,  # More failures = higher priority
+            x[1].due_date,          # Older due date = higher priority
+            x[1].ease_factor        # Lower ease = higher priority
+        )
     )
 
-    # Sort due today by difficulty (hardest first)
+    # Sort due today cards by:
+    # 1. Failed reviews (prioritize problematic cards)
+    # 2. Ease factor (lower ease = more difficult)
+    # 3. Average rating (lower rating = needs more practice)
     # Note: All items in due_today have non-None stats due to filtering above
     due_today.sort(
-        key=lambda x: -x[1].ease_factor
+        key=lambda x: (
+            -x[1].failed_reviews,                    # More failures = higher priority
+            x[1].ease_factor,                         # Lower ease = higher priority
+            x[1].average_rating if x[1].average_rating else 2.0  # Lower avg rating = higher priority
+        )
     )
 
     print(f"📊 [SUMMARY] Overdue: {len(overdue_cards)}, Due Today: {len(due_today)}, New: {len(new_cards)}")

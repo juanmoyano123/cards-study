@@ -20,7 +20,9 @@ from app.schemas.stats import (
     DashboardStats,
     TodayStats,
     HeatmapDay,
-    SubjectProgress
+    SubjectProgress,
+    DeckMetrics,
+    ProblematicCard
 )
 from app.schemas.goal import DailyProgressResponse
 
@@ -421,4 +423,188 @@ async def get_daily_progress(
         easy_ratings_today=easy_ratings_today,
         cards_studied_today=cards_studied_today,
         study_minutes_today=study_minutes_today
+    )
+
+
+@router.get("/deck/{deck_name}/metrics", response_model=DeckMetrics)
+async def get_deck_metrics(
+    deck_name: str,
+    db: Session = Depends(get_db),
+    user_id: str = Depends(get_current_user_id)
+):
+    """
+    Get detailed metrics for a specific deck/subject.
+
+    Args:
+        deck_name: The name of the deck (tag/subject)
+
+    Returns:
+        DeckMetrics with comprehensive statistics
+    """
+    # Get all flashcards for this deck
+    cards_query = db.query(
+        Flashcard,
+        CardStats
+    ).outerjoin(
+        CardStats,
+        and_(
+            CardStats.card_id == Flashcard.id,
+            CardStats.user_id == user_id
+        )
+    ).filter(
+        Flashcard.user_id == user_id,
+        Flashcard.status == "active",
+        Flashcard.deleted_at.is_(None)
+    )
+
+    # Filter by deck (tag)
+    if deck_name != "Sin categoría":
+        # Filter cards that have this tag
+        cards_query = cards_query.filter(
+            Flashcard.tags.contains([deck_name])
+        )
+    else:
+        # Filter cards with no tags or empty tags
+        cards_query = cards_query.filter(
+            or_(
+                Flashcard.tags == None,
+                Flashcard.tags == []
+            )
+        )
+
+    cards_data = cards_query.all()
+
+    if not cards_data:
+        # Return empty metrics if deck not found
+        return DeckMetrics(
+            deck_name=deck_name,
+            total_cards=0
+        )
+
+    # Initialize counters
+    total_cards = len(cards_data)
+    easy_count = 0
+    good_count = 0
+    hard_count = 0
+    again_count = 0
+    new_count = 0
+    total_rating_sum = 0.0
+    total_reviews = 0
+    total_study_time = 0
+    last_studied = None
+    cards_with_ratings = 0
+
+    card_ids = []
+    for flashcard, card_stat in cards_data:
+        card_ids.append(flashcard.id)
+
+        if card_stat:
+            # Count by last rating (we'll get this from card_reviews)
+            if card_stat.total_reviews == 0:
+                new_count += 1
+            else:
+                if card_stat.average_rating:
+                    total_rating_sum += card_stat.average_rating
+                    cards_with_ratings += 1
+
+                total_reviews += card_stat.total_reviews
+
+                # Track last studied date
+                if card_stat.last_reviewed_at:
+                    reviewed_date = card_stat.last_reviewed_at.date()
+                    if last_studied is None or reviewed_date > last_studied:
+                        last_studied = reviewed_date
+        else:
+            new_count += 1
+
+    # Get last ratings from card_reviews for rating distribution
+    if card_ids:
+        # Get the most recent review for each card
+        from sqlalchemy import distinct
+
+        latest_reviews_subquery = db.query(
+            CardReview.card_id,
+            func.max(CardReview.reviewed_at).label('max_reviewed_at')
+        ).filter(
+            CardReview.card_id.in_(card_ids),
+            CardReview.user_id == user_id
+        ).group_by(CardReview.card_id).subquery()
+
+        latest_reviews = db.query(CardReview).join(
+            latest_reviews_subquery,
+            and_(
+                CardReview.card_id == latest_reviews_subquery.c.card_id,
+                CardReview.reviewed_at == latest_reviews_subquery.c.max_reviewed_at
+            )
+        ).all()
+
+        for review in latest_reviews:
+            if review.rating == 4:
+                easy_count += 1
+            elif review.rating == 3:
+                good_count += 1
+            elif review.rating == 2:
+                hard_count += 1
+            elif review.rating == 1:
+                again_count += 1
+
+    # Calculate failed reviews this month
+    month_ago = date.today() - timedelta(days=30)
+    failed_reviews_this_month = db.query(CardReview).filter(
+        CardReview.card_id.in_(card_ids) if card_ids else False,
+        CardReview.user_id == user_id,
+        CardReview.rating < 3,
+        CardReview.reviewed_at >= month_ago
+    ).count()
+
+    # Get problematic cards (top 5 with most failed reviews)
+    problematic_cards_data = db.query(
+        Flashcard.id,
+        Flashcard.question,
+        CardStats.failed_reviews,
+        CardStats.average_rating,
+        CardStats.last_reviewed_at
+    ).join(
+        CardStats,
+        and_(
+            CardStats.card_id == Flashcard.id,
+            CardStats.user_id == user_id
+        )
+    ).filter(
+        Flashcard.id.in_(card_ids) if card_ids else False,
+        CardStats.failed_reviews > 0
+    ).order_by(
+        desc(CardStats.failed_reviews)
+    ).limit(5).all()
+
+    problematic_cards = [
+        ProblematicCard(
+            card_id=str(card_id),
+            question=question[:100] + "..." if len(question) > 100 else question,
+            failed_reviews=failed_reviews,
+            average_rating=avg_rating or 0.0,
+            last_failed=last_reviewed
+        )
+        for card_id, question, failed_reviews, avg_rating, last_reviewed in problematic_cards_data
+    ]
+
+    # Calculate metrics
+    average_rating = (total_rating_sum / cards_with_ratings) if cards_with_ratings > 0 else 0.0
+    mastery_percentage = (easy_count / total_cards * 100) if total_cards > 0 else 0.0
+
+    return DeckMetrics(
+        deck_name=deck_name,
+        total_cards=total_cards,
+        easy_count=easy_count,
+        good_count=good_count,
+        hard_count=hard_count,
+        again_count=again_count,
+        new_count=new_count,
+        mastery_percentage=round(mastery_percentage, 1),
+        average_rating=round(average_rating, 2),
+        failed_reviews_this_month=failed_reviews_this_month,
+        total_reviews=total_reviews,
+        last_studied=last_studied,
+        total_study_time_minutes=total_study_time,
+        problematic_cards=problematic_cards
     )
