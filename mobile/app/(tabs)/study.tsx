@@ -249,30 +249,49 @@ export default function StudyScreen() {
         />
       </View>
 
-      {/* Pomodoro Timer (collapsible) */}
-      {showPomodoroTimer && (
-        <View style={styles.pomodoroContainer}>
-          <PomodoroTimer
-            onComplete={() => {
-              // Pomodoro completed - could show a toast or notification
-            }}
-            onOpenSettings={() => setShowPomodoroSettings(true)}
-          />
-        </View>
-      )}
-
-      {/* Card */}
-      <View style={styles.cardContainer}>
-        {currentCard && (
-          <StudyFlashcard
-            card={currentCard}
-            isFlipped={isFlipped}
-            onFlip={flipCard}
-          />
+      {/* Content Area - ScrollView when Pomodoro is visible */}
+      <ScrollView
+        style={styles.contentScrollView}
+        contentContainerStyle={showPomodoroTimer ? styles.scrollableContent : styles.flexContent}
+        scrollEnabled={showPomodoroTimer}
+        showsVerticalScrollIndicator={showPomodoroTimer}
+      >
+        {/* Pomodoro Timer (collapsible) */}
+        {showPomodoroTimer && (
+          <View style={styles.pomodoroContainer}>
+            <PomodoroTimer
+              onComplete={() => {
+                // Pomodoro completed - could show a toast or notification
+              }}
+              onOpenSettings={() => setShowPomodoroSettings(true)}
+            />
+          </View>
         )}
-      </View>
 
-      {/* Rating buttons (only show when flipped) */}
+        {/* Card */}
+        <View style={showPomodoroTimer ? styles.cardContainerScrollable : styles.cardContainer}>
+          {currentCard && (
+            <StudyFlashcard
+              card={currentCard}
+              isFlipped={isFlipped}
+              onFlip={flipCard}
+            />
+          )}
+        </View>
+
+        {/* Tap to flip hint (when not flipped) */}
+        {!isFlipped && (
+          <View style={styles.hintContainer}>
+            <Card style={styles.hintCard}>
+              <Text style={styles.hintText}>
+                Tap the card to reveal the answer
+              </Text>
+            </Card>
+          </View>
+        )}
+      </ScrollView>
+
+      {/* Rating buttons (only show when flipped) - Fixed at bottom */}
       {isFlipped && currentCard && (
         <View style={styles.ratingContainer}>
           <RatingButtons
@@ -280,17 +299,6 @@ export default function StudyScreen() {
             onRate={handleRate}
             disabled={submitting}
           />
-        </View>
-      )}
-
-      {/* Tap to flip hint (when not flipped) */}
-      {!isFlipped && (
-        <View style={styles.hintContainer}>
-          <Card style={styles.hintCard}>
-            <Text style={styles.hintText}>
-              Tap the card to reveal the answer
-            </Text>
-          </Card>
         </View>
       )}
 
@@ -367,8 +375,22 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing[4],
     paddingTop: spacing[2],
   },
+  contentScrollView: {
+    flex: 1,
+  },
+  flexContent: {
+    flexGrow: 1,
+  },
+  scrollableContent: {
+    paddingBottom: spacing[4],
+  },
   cardContainer: {
     flex: 1,
+    justifyContent: 'center',
+    paddingVertical: spacing[4],
+  },
+  cardContainerScrollable: {
+    minHeight: 400,
     justifyContent: 'center',
     paddingVertical: spacing[4],
   },
