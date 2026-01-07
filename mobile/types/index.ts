@@ -36,12 +36,48 @@ export interface SignInCredentials {
 export interface StudyMaterial {
   id: string;
   user_id: string;
-  title: string;
-  source_type: 'pdf' | 'text' | 'manual';
+  filename: string;
   extracted_text: string;
-  subject?: string;
+  word_count?: number;
+  subject_category?: string;
+  tags: string[];
+  status: string;
+  processed_at?: string;
+  error_message?: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
+  flashcard_count: number;
+}
+
+export interface MaterialFlashcard {
+  id: string;
+  question: string;
+  answer: string;
+  explanation?: string;
+  difficulty: number;
+  tags: string[];
+  status: string;
+  study_material_id?: string;
+  created_at: string;
+  stats: {
+    mastery_level: string;
+    total_reviews: number;
+    due_date?: string;
+  };
+}
+
+export interface MaterialFlashcardsResponse {
+  material_id: string;
+  material_name: string;
+  flashcards: MaterialFlashcard[];
+  total: number;
+}
+
+export interface MaterialListResponse {
+  materials: StudyMaterial[];
+  total: number;
+  page: number;
+  page_size: number;
 }
 
 // Flashcard types

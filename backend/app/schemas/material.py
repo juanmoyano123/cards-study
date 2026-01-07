@@ -37,6 +37,7 @@ class MaterialResponse(BaseModel):
     error_message: Optional[str]
     created_at: datetime
     updated_at: Optional[datetime]
+    flashcard_count: int = 0  # Number of flashcards generated from this material
 
     class Config:
         from_attributes = True
