@@ -4,7 +4,7 @@ Stats schemas - Response models for statistics endpoints.
 
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional, Dict
-from datetime import date
+from datetime import date, datetime
 
 
 class HeatmapDay(BaseModel):
@@ -63,3 +63,42 @@ class TodayStats(BaseModel):
     cards_studied: int
     study_time_minutes: int
     current_streak: int
+
+
+class ProblematicCard(BaseModel):
+    """Card that has been failed multiple times."""
+    model_config = ConfigDict(from_attributes=True)
+
+    card_id: str
+    question: str
+    failed_reviews: int
+    last_failed: Optional[datetime] = None
+    average_rating: float
+
+
+class DeckMetrics(BaseModel):
+    """Detailed metrics for a specific deck/subject."""
+    model_config = ConfigDict(from_attributes=True)
+
+    deck_name: str
+    total_cards: int
+
+    # Rating distribution
+    easy_count: int = Field(0, description="Cards with last rating = 4 (Easy)")
+    good_count: int = Field(0, description="Cards with last rating = 3 (Good)")
+    hard_count: int = Field(0, description="Cards with last rating = 2 (Hard)")
+    again_count: int = Field(0, description="Cards with last rating = 1 (Again)")
+    new_count: int = Field(0, description="Cards never reviewed")
+
+    # Performance metrics
+    mastery_percentage: float = Field(0.0, description="Percentage of cards rated Easy")
+    average_rating: float = Field(0.0, description="Average rating across all cards")
+    failed_reviews_this_month: int = Field(0, description="Total failed reviews (rating < 3) this month")
+
+    # Study history
+    total_reviews: int = Field(0, description="Total number of reviews")
+    last_studied: Optional[date] = None
+    total_study_time_minutes: int = Field(0, description="Total time spent on this deck")
+
+    # Problematic cards (top 5)
+    problematic_cards: List[ProblematicCard] = Field(default_factory=list)
