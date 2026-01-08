@@ -74,6 +74,7 @@ export const CardPreview = React.memo<CardPreviewProps>(({
           style={styles.checkboxContainer}
           onPress={() => onToggleSelect(item.id)}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          testID={`checkbox-${item.id}`}
         >
           <View
             style={[

@@ -65,7 +65,7 @@ describe('CardPreview', () => {
   });
 
   it('calls onToggleSelect when checkbox is pressed', () => {
-    const { getAllByRole } = render(
+    const { getByTestId } = render(
       <CardPreview
         cards={mockCards}
         onToggleSelect={mockOnToggleSelect}
@@ -76,8 +76,8 @@ describe('CardPreview', () => {
       />
     );
 
-    const checkboxes = getAllByRole('button');
-    fireEvent.press(checkboxes[0]); // Press first checkbox
+    const checkbox = getByTestId('checkbox-1');
+    fireEvent.press(checkbox);
 
     expect(mockOnToggleSelect).toHaveBeenCalledWith('1');
   });

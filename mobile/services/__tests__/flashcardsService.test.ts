@@ -13,26 +13,24 @@ describe('flashcardsService', () => {
     it('generates flashcards successfully', async () => {
       const mockResponse = {
         data: {
-          data: {
-            cards: [
-              {
-                id: 'card-1',
-                question: 'What is React?',
-                answer: 'A JavaScript library',
-                difficulty: 2,
-                tags: ['react'],
-              },
-              {
-                id: 'card-2',
-                question: 'What is TypeScript?',
-                answer: 'A typed superset of JavaScript',
-                difficulty: 3,
-                tags: ['typescript'],
-              },
-            ],
-            count: 2,
-            material_id: 'material-123',
-          },
+          cards: [
+            {
+              id: 'card-1',
+              question: 'What is React?',
+              answer: 'A JavaScript library',
+              difficulty: 2,
+              tags: ['react'],
+            },
+            {
+              id: 'card-2',
+              question: 'What is TypeScript?',
+              answer: 'A typed superset of JavaScript',
+              difficulty: 3,
+              tags: ['typescript'],
+            },
+          ],
+          count: 2,
+          material_id: 'material-123',
         },
       };
 
@@ -43,10 +41,14 @@ describe('flashcardsService', () => {
         card_count: 2,
       });
 
-      expect(api.post).toHaveBeenCalledWith('/flashcards/generate', {
-        material_id: 'material-123',
-        card_count: 2,
-      });
+      expect(api.post).toHaveBeenCalledWith(
+        '/flashcards/generate',
+        {
+          material_id: 'material-123',
+          card_count: 2,
+        },
+        { timeout: 90000 }
+      );
 
       expect(result.cards).toHaveLength(2);
       expect(result.count).toBe(2);
@@ -56,11 +58,9 @@ describe('flashcardsService', () => {
     it('includes difficulty when provided', async () => {
       const mockResponse = {
         data: {
-          data: {
-            cards: [],
-            count: 0,
-            material_id: 'material-123',
-          },
+          cards: [],
+          count: 0,
+          material_id: 'material-123',
         },
       };
 
@@ -76,18 +76,15 @@ describe('flashcardsService', () => {
         '/flashcards/generate',
         expect.objectContaining({
           difficulty: 4,
-        })
+        }),
+        { timeout: 90000 }
       );
     });
 
     it('throws error when generation fails', async () => {
-      const mockResponse = {
-        data: {
-          error: 'Failed to generate flashcards',
-        },
-      };
-
-      (api.post as jest.Mock).mockResolvedValue(mockResponse);
+      (api.post as jest.Mock).mockRejectedValue(
+        new Error('Failed to generate flashcards')
+      );
 
       await expect(
         flashcardsService.generateFlashcards({

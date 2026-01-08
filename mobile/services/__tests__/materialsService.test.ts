@@ -139,12 +139,10 @@ describe('materialsService', () => {
     it('fetches a single material by ID', async () => {
       const mockResponse = {
         data: {
-          data: {
-            id: 'material-123',
-            filename: 'My Document',
-            extracted_text: 'Full text content',
-            word_count: 500,
-          },
+          id: 'material-123',
+          filename: 'My Document',
+          extracted_text: 'Full text content',
+          word_count: 500,
         },
       };
 
@@ -157,13 +155,9 @@ describe('materialsService', () => {
     });
 
     it('throws error when material not found', async () => {
-      const mockResponse = {
-        data: {
-          error: 'Material not found',
-        },
-      };
-
-      (api.get as jest.Mock).mockResolvedValue(mockResponse);
+      (api.get as jest.Mock).mockRejectedValue(
+        new Error('Material not found')
+      );
 
       await expect(
         materialsService.getMaterial('nonexistent')
