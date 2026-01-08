@@ -184,7 +184,7 @@ export default function DeckStudyScreen() {
             headerBackTitle: 'Back',
           }}
         />
-        <LoadingOverlay message="Loading flashcards..." />
+        <LoadingOverlay visible={true} message="Loading flashcards..." />
       </SafeAreaView>
     );
   }
@@ -202,8 +202,10 @@ export default function DeckStudyScreen() {
           icon={BookOpen}
           title="No Flashcards"
           description="This deck has no flashcards yet. Generate cards from the material first."
-          actionLabel="Go Back"
-          onAction={handleGoBack}
+          primaryAction={{
+            label: 'Go Back',
+            onPress: handleGoBack,
+          }}
         />
       </SafeAreaView>
     );
@@ -226,13 +228,12 @@ export default function DeckStudyScreen() {
         >
           <StudySessionSummary
             cardsStudied={cardsStudied}
-            ratingsAgain={ratingsAgain}
-            ratingsHard={ratingsHard}
-            ratingsGood={ratingsGood}
-            ratingsEasy={ratingsEasy}
+            cardsAgain={ratingsAgain}
+            cardsHard={ratingsHard}
+            cardsGood={ratingsGood}
+            cardsEasy={ratingsEasy}
             timeSpentMinutes={timeSpent}
-            streakDay={0}
-            onStudyMore={handleStudyMore}
+            onContinue={handleStudyMore}
             onGoToDashboard={() => router.push('/(tabs)/')}
           />
         </ScrollView>
@@ -322,26 +323,26 @@ export default function DeckStudyScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
+    backgroundColor: colors.neutral[50],
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: spacing.lg,
+    padding: spacing[6],
   },
   content: {
     flex: 1,
-    padding: spacing.lg,
+    padding: spacing[6],
   },
   progressSection: {
-    marginBottom: spacing.lg,
+    marginBottom: spacing[6],
   },
   progressHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: spacing.sm,
+    marginBottom: spacing[2],
   },
   progressText: {
     fontSize: 14,
@@ -356,14 +357,14 @@ const styles = StyleSheet.create({
   cardContainer: {
     flex: 1,
     justifyContent: 'center',
-    marginVertical: spacing.lg,
+    marginVertical: spacing[6],
   },
   ratingSection: {
-    marginTop: spacing.lg,
+    marginTop: spacing[6],
   },
   statsCard: {
-    marginTop: spacing.lg,
-    padding: spacing.md,
+    marginTop: spacing[6],
+    padding: spacing[4],
   },
   stats: {
     flexDirection: 'row',
@@ -377,7 +378,7 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: 12,
     color: colors.text.secondary,
-    marginBottom: spacing.xs,
+    marginBottom: spacing[1],
   },
   statValue: {
     fontSize: 20,

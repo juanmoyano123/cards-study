@@ -87,7 +87,7 @@ export default function DecksScreen() {
             ),
           }}
         />
-        <LoadingOverlay message="Loading decks..." />
+        <LoadingOverlay visible={true} message="Loading decks..." />
       </SafeAreaView>
     );
   }
@@ -121,8 +121,10 @@ export default function DecksScreen() {
             icon={BookOpen}
             title="No Decks Yet"
             description="Upload materials or paste text to create your first study deck."
-            actionLabel="Upload Material"
-            onAction={() => router.push('/(tabs)/upload')}
+            primaryAction={{
+              label: 'Upload Material',
+              onPress: () => router.push('/(tabs)/upload'),
+            }}
           />
         ) : (
           <>
@@ -214,37 +216,37 @@ export default function DecksScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background.primary,
+    backgroundColor: colors.neutral[50],
   },
   scrollView: {
     flex: 1,
   },
   scrollContent: {
-    padding: spacing.lg,
+    padding: spacing[6],
   },
   header: {
-    marginBottom: spacing.lg,
+    marginBottom: spacing[6],
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: '700',
     color: colors.text.primary,
-    marginBottom: spacing.xs,
+    marginBottom: spacing[1],
   },
   headerSubtitle: {
     fontSize: 14,
     color: colors.text.secondary,
   },
   decksList: {
-    gap: spacing.md,
+    gap: spacing[4],
   },
   deckCard: {
-    padding: spacing.md,
+    padding: spacing[4],
   },
   deckHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: spacing.md,
+    marginBottom: spacing[4],
   },
   deckIcon: {
     width: 48,
@@ -253,7 +255,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary[50],
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: spacing.md,
+    marginRight: spacing[4],
   },
   deckInfo: {
     flex: 1,
@@ -262,7 +264,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: colors.text.primary,
-    marginBottom: spacing.xs,
+    marginBottom: spacing[1],
   },
   categoryBadge: {
     flexDirection: 'row',
@@ -276,8 +278,8 @@ const styles = StyleSheet.create({
   deckStats: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.lg,
-    paddingTop: spacing.md,
+    gap: spacing[6],
+    paddingTop: spacing[4],
     borderTopWidth: 1,
     borderTopColor: colors.border.light,
   },
@@ -298,13 +300,13 @@ const styles = StyleSheet.create({
   tags: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.xs,
-    marginTop: spacing.sm,
+    gap: spacing[1],
+    marginTop: spacing[2],
   },
   tag: {
     backgroundColor: colors.neutral[100],
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing[2],
+    paddingVertical: spacing[1],
     borderRadius: 12,
   },
   tagText: {
@@ -315,7 +317,7 @@ const styles = StyleSheet.create({
   moreTags: {
     fontSize: 11,
     color: colors.text.secondary,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing[2],
+    paddingVertical: spacing[1],
   },
 });
