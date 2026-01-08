@@ -9,6 +9,8 @@ export { materialsService } from './materialsService';
 export { flashcardsService } from './flashcardsService';
 export { studyService } from './studyService';
 export { pomodoroService } from './pomodoroService';
+export * from './goalService';
+export * from './statsService';
 
 export type {
   GenerateFlashcardsRequest,

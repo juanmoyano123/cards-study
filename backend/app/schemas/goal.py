@@ -2,13 +2,15 @@
 Goal schemas - Request and response models for user goals.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Literal
 from datetime import datetime
 
 
 class UserGoalResponse(BaseModel):
     """User goal configuration response."""
+    model_config = ConfigDict(from_attributes=True)
+
     user_id: str
     daily_cards_goal: int = Field(..., description="Target number of cards to master daily", ge=1, le=500)
     goal_type: Literal["easy_ratings", "cards_studied", "study_minutes"] = Field(
@@ -17,9 +19,6 @@ class UserGoalResponse(BaseModel):
     )
     created_at: datetime
     updated_at: datetime
-
-    class Config:
-        orm_mode = True
 
 
 class UserGoalUpdate(BaseModel):
@@ -44,5 +43,4 @@ class DailyProgressResponse(BaseModel):
     cards_studied_today: int = Field(0, description="Total cards studied today")
     study_minutes_today: int = Field(0, description="Total study minutes today")
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)

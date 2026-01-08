@@ -2,7 +2,7 @@
 Material schemas - Request and response models for study materials.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 import uuid
@@ -25,6 +25,8 @@ class MaterialUpdate(BaseModel):
 
 class MaterialResponse(BaseModel):
     """Response schema for study material."""
+    model_config = ConfigDict(from_attributes=True)
+
     id: uuid.UUID
     user_id: uuid.UUID
     filename: str
@@ -38,9 +40,6 @@ class MaterialResponse(BaseModel):
     created_at: datetime
     updated_at: Optional[datetime]
     flashcard_count: int = 0  # Number of flashcards generated from this material
-
-    class Config:
-        from_attributes = True
 
 
 class MaterialListResponse(BaseModel):

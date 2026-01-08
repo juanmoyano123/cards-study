@@ -387,7 +387,6 @@ async def submit_review(
 
         # Update mastery counts
         if stats.mastery_level == "mastered" and prev_interval < 30:
-            user_stats.total_cards_mastered += 1
             user_stats.cards_mastered += 1
             if stats.mastery_level != "new":
                 user_stats.cards_new = max(0, user_stats.cards_new - 1)

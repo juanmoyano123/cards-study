@@ -2,7 +2,7 @@
 Flashcard schemas - Request and response models for flashcards.
 """
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional, List
 from datetime import datetime
 import uuid
@@ -31,6 +31,8 @@ class FlashcardUpdate(BaseModel):
 
 class FlashcardResponse(BaseModel):
     """Response schema for flashcard."""
+    model_config = ConfigDict(from_attributes=True)
+
     id: uuid.UUID
     user_id: uuid.UUID
     material_id: Optional[uuid.UUID]
@@ -44,9 +46,6 @@ class FlashcardResponse(BaseModel):
     status: str
     created_at: datetime
     updated_at: Optional[datetime]
-
-    class Config:
-        from_attributes = True
 
 
 class FlashcardWithStats(FlashcardResponse):

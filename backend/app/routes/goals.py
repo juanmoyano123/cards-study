@@ -2,19 +2,15 @@
 Goals routes - User goal management endpoints.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
-from sqlalchemy import and_
-from datetime import date
 
 from app.utils.database import get_db
 from app.utils.auth import get_current_user_id
 from app.models.user_goal import UserGoal
-from app.models.study_session import StudySession
 from app.schemas.goal import (
     UserGoalResponse,
     UserGoalUpdate,
-    DailyProgressResponse
 )
 
 router = APIRouter()

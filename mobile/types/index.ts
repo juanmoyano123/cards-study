@@ -141,17 +141,7 @@ export interface UserStats {
   updated_at: string;
 }
 
-// Dashboard types
-export interface DashboardStats {
-  current_streak: number;
-  longest_streak: number;
-  cards_due_today: number;
-  cards_studied_today: number;
-  total_cards_mastered: number;
-  heatmap_data: HeatmapData[];
-  progress_by_subject: SubjectProgress[];
-}
-
+// Dashboard types (DashboardStats is defined in services/statsService.ts)
 export interface HeatmapData {
   date: string; // YYYY-MM-DD
   count: number;

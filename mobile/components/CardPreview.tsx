@@ -7,7 +7,10 @@ import {
   ViewStyle,
 } from 'react-native';
 import { Edit2, Trash2, Check } from 'lucide-react-native';
-import { Text, Card, Badge, Checkbox } from '.';
+import { Text } from './Text';
+import { Card } from './Card';
+import { Badge } from './Badge';
+import { Checkbox } from './Checkbox';
 import { colors, spacing, borderRadius } from '../constants';
 
 export interface PreviewCard {

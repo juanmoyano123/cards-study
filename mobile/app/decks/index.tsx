@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { router, Stack } from 'expo-router';
-import { BookOpen, Tag, Calendar, ChevronRight } from 'lucide-react-native';
+import { BookOpen, Tag, Calendar, ChevronRight, ArrowLeft } from 'lucide-react-native';
 import {
   Text,
   Button,
@@ -77,6 +77,14 @@ export default function DecksScreen() {
           options={{
             title: 'My Decks',
             headerBackTitle: 'Back',
+            headerLeft: () => (
+              <TouchableOpacity
+                onPress={() => router.back()}
+                style={{ marginLeft: spacing[2], padding: spacing[2] }}
+              >
+                <ArrowLeft size={24} color={colors.text.primary} />
+              </TouchableOpacity>
+            ),
           }}
         />
         <LoadingOverlay message="Loading decks..." />
@@ -90,6 +98,14 @@ export default function DecksScreen() {
         options={{
           title: 'My Decks',
           headerBackTitle: 'Back',
+          headerLeft: () => (
+            <TouchableOpacity
+              onPress={() => router.back()}
+              style={{ marginLeft: spacing[2], padding: spacing[2] }}
+            >
+              <ArrowLeft size={24} color={colors.text.primary} />
+            </TouchableOpacity>
+          ),
         }}
       />
 

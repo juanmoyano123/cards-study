@@ -9,7 +9,12 @@ import {
   Platform,
 } from 'react-native';
 import { X } from 'lucide-react-native';
-import { Text, Input, Textarea, Button, Select, Card } from '.';
+import { Text } from './Text';
+import { Input } from './Input';
+import { Textarea } from './Textarea';
+import { Button } from './Button';
+import { Select } from './Select';
+import { Card } from './Card';
 import { colors, spacing, borderRadius } from '../constants';
 
 export interface EditableCard {

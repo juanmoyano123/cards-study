@@ -2,7 +2,7 @@
 Authentication schemas - Request and response models for auth endpoints.
 """
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from typing import Optional
 from datetime import datetime
 import uuid
@@ -30,6 +30,8 @@ class TokenResponse(BaseModel):
 
 class UserResponse(BaseModel):
     """Response schema for user data."""
+    model_config = ConfigDict(from_attributes=True)
+
     id: uuid.UUID
     email: str
     name: str
@@ -40,9 +42,6 @@ class UserResponse(BaseModel):
     created_at: datetime
     updated_at: Optional[datetime] = None
     last_login_at: Optional[datetime] = None
-
-    class Config:
-        from_attributes = True
 
 
 class UpdateUserRequest(BaseModel):

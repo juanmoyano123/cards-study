@@ -438,7 +438,7 @@ async def get_material_flashcards(
             "difficulty": card.difficulty,
             "tags": card.tags,
             "status": card.status,
-            "study_material_id": str(card.material_id) if card.material_id else None,
+            "material_id": str(card.material_id) if card.material_id else None,
             "created_at": card.created_at.isoformat() if card.created_at else None,
         }
 
