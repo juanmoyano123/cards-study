@@ -107,7 +107,7 @@ describe('materialsService', () => {
     it('fetches materials list successfully', async () => {
       const mockResponse = {
         data: {
-          data: [
+          materials: [
             {
               id: 'mat-1',
               filename: 'Document 1',
@@ -121,8 +121,7 @@ describe('materialsService', () => {
           ],
           total: 2,
           page: 1,
-          per_page: 20,
-          total_pages: 1,
+          page_size: 20,
         },
       };
 
@@ -130,8 +129,8 @@ describe('materialsService', () => {
 
       const result = await materialsService.getMaterials(1, 20);
 
-      expect(api.get).toHaveBeenCalledWith('/materials?page=1&per_page=20');
-      expect(result.data).toHaveLength(2);
+      expect(api.get).toHaveBeenCalledWith('/materials?page=1&page_size=20');
+      expect(result.materials).toHaveLength(2);
       expect(result.total).toBe(2);
     });
   });
